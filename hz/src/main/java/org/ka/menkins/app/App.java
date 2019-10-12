@@ -18,12 +18,18 @@ public class App {
         var id = 1;
 
         var config = AppConfig.builder()
-                .pathToMesosLib("/home/aleksandr/src/3rd/mesos/mesos-1.9.0/build/src/.libs/libmesos.so")
-                .role("*")
-                .slaveUser("nobody")
-                .frameworkName("menkins-" + id)
-                .mesosMasterUrl("172.28.128.7:5050")
+                .mesos(
+                        AppConfig.Mesos.builder()
+                                .pathToMesosLib("/home/aleksandr/src/3rd/mesos/mesos-1.9.0/build/src/.libs/libmesos.so")
+                                .role("*")
+                                .slaveUser("nobody")
+                                .frameworkName("menkins-" + id)
+                                .mesosMasterUrl("172.28.128.7:5050")
+                                .checkpoint(true)
+                                .build()
+                )
                 .port(5678)
+                .url("http://localhost:5678")
                 .hazelcast(null)
                 .build();
 
@@ -56,14 +62,14 @@ public class App {
             return "";
         }));
 
-        Schedulers.newInitializer(queue).run();
+        Schedulers.newInitializer(config, queue).run();
 
 
         awaitInitialization();
     }
 
     private void validate() {
-        MesosNativeLibrary.load(config.getPathToMesosLib());
+        MesosNativeLibrary.load(config.getMesos().getPathToMesosLib());
     }
 
 }
