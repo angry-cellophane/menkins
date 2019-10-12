@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <Console name="STDOUT" target="SYSTEM_OUT">
+            <PatternLayout pattern="current date-%d LEVEL-%-5p  Thread-[%t]  Method-%M()   Class name-%C   %m%n"/>
+        </Console>
+    </Appenders>
+    <loggers>
+        <Logger name="org.apache.log4j.xml" level="info"/>
+        <root level="info">
+            <appender-ref ref="STDOUT"/>
+        </root>
+    </loggers>
+</Configuration>
