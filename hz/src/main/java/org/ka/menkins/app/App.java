@@ -7,7 +7,11 @@ import org.ka.menkins.mesos.Schedulers;
 import org.ka.menkins.queue.NodeRequest;
 import org.ka.menkins.queue.RequestsQueue;
 
-import static spark.Spark.*;
+import static spark.Spark.awaitInitialization;
+import static spark.Spark.get;
+import static spark.Spark.path;
+import static spark.Spark.port;
+import static spark.Spark.post;
 
 @AllArgsConstructor
 public class App {
