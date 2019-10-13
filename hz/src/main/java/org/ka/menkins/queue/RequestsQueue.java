@@ -11,6 +11,7 @@ public class RequestsQueue {
     private static final String QUEUE_NAME = "menkins-requests-queue";
 
     public static BlockingQueue<NodeRequestWithResources> getQueue(Config config) {
+        // tmp hack to run locally faster
         if (true) {
             return new LinkedBlockingQueue<>();
         }
