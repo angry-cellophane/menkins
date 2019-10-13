@@ -4,6 +4,8 @@ apply plugin: 'application'
 mainClassName = 'org.ka.menkins.app.App'
 
 dependencies {
+    compile project(':menkins-client')
+
     compile libraries.spark
     compile libraries.jackson
     compile libraries.hz
