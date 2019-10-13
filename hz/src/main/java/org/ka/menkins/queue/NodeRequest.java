@@ -3,12 +3,15 @@ package org.ka.menkins.queue;
 import lombok.Value;
 
 @Value
-public class BuilderNodeRequest {
+public class NodeRequest {
+    String id;
     String nodeName;
     String labels;
     String jenkinsUrl;
     String jnlpUrl;
+    String jnlpJarUrl;
     String jnlpSecret;
+    String jnlpArgs;
 
     public void validate() {
         if (nodeName == null) {
@@ -26,5 +29,10 @@ public class BuilderNodeRequest {
         if (jnlpUrl == null) {
             throw new RuntimeException("jnlp url is null in builder node request");
         }
+    }
+
+    public NodeRequestWithResources toWithResources() {
+        var docker = ResourcesByLabelsLookup.lookup(this.labels);
+        return new NodeRequestWithResources(this, docker);
     }
 }

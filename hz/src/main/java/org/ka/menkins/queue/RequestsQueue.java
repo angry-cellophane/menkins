@@ -9,7 +9,7 @@ public class RequestsQueue {
 
     private static final String QUEUE_NAME = "menkins-requests-queue";
 
-    public static BlockingQueue<BuilderNodeRequest> getQueue(Config config) {
+    public static BlockingQueue<NodeRequestWithResources> getQueue(Config config) {
         var hz = Hazelcast.newHazelcastInstance(config);
         Runtime.getRuntime().addShutdownHook(new Thread(() -> hz.getLifecycleService().shutdown()));
 

@@ -17,6 +17,7 @@ public class AppConfig {
         @NonNull String slaveUser;
         @NonNull String mesosMasterUrl;
         @NonNull String frameworkName;
+        double refuseInSeconds;
         boolean checkpoint;
     }
 

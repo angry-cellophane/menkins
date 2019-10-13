@@ -4,7 +4,7 @@ import io.prometheus.client.exporter.MetricsServlet;
 import lombok.AllArgsConstructor;
 import org.apache.mesos.MesosNativeLibrary;
 import org.ka.menkins.mesos.Schedulers;
-import org.ka.menkins.queue.BuilderNodeRequest;
+import org.ka.menkins.queue.NodeRequest;
 import org.ka.menkins.queue.RequestsQueue;
 
 import static spark.Spark.*;
@@ -47,9 +47,9 @@ public class App {
             post("/node", "application/json", ((request, response) -> {
                 Metrics.Requests.total.inc();
 
-                var node = Json.from(request.bodyAsBytes(), BuilderNodeRequest.class);
+                var node = Json.from(request.bodyAsBytes(), NodeRequest.class);
                 node.validate();
-                queue.add(node);
+                queue.add(node.toWithResources());
 
                 return "";
             }));

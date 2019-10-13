@@ -6,7 +6,7 @@ import org.apache.mesos.MesosSchedulerDriver;
 import org.apache.mesos.Protos;
 import org.apache.mesos.SchedulerDriver;
 import org.ka.menkins.app.AppConfig;
-import org.ka.menkins.queue.BuilderNodeRequest;
+import org.ka.menkins.queue.NodeRequestWithResources;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,14 +21,14 @@ public class Schedulers {
 
     @Value
     static class State {
-        BlockingQueue<List<BuilderNodeRequest>> localQueue;
+        BlockingQueue<List<NodeRequestWithResources>> localQueue;
         AtomicBoolean suppress;
         AtomicReference<SchedulerDriver> driver;
     }
 
     private Schedulers() {}
 
-    public static Runnable newInitializer(AppConfig config, BlockingQueue<BuilderNodeRequest> globalQueue) {
+    public static Runnable newInitializer(AppConfig config, BlockingQueue<NodeRequestWithResources> globalQueue) {
         return () -> {
             log.info("Initializing driver");
 
@@ -36,7 +36,7 @@ public class Schedulers {
                     new AtomicBoolean(false),
                     new AtomicReference<>(null));
 
-            var offersProcessor = new OffersProcessor(state, globalQueue);
+            var offersProcessor = new OffersProcessor(config, state);
             var scheduler = new MenkinsScheduler(offersProcessor);
 
             var driver = new MesosSchedulerDriver(scheduler, newFrameworkInfo(config), config.getMesos().getMesosMasterUrl());
@@ -73,11 +73,11 @@ public class Schedulers {
         thread.start();
     }
 
-    private static void startBufferThread(State state, BlockingQueue<BuilderNodeRequest> globalQueue) {
+    private static void startBufferThread(State state, BlockingQueue<NodeRequestWithResources> globalQueue) {
         var BUFFER_SIZE = 5;
         var TIME_LIMIT = TimeUnit.SECONDS.toMillis(5);
         var thread = new Thread(() -> {
-            var local = new ArrayList<BuilderNodeRequest>(BUFFER_SIZE);
+            var local = new ArrayList<NodeRequestWithResources>(BUFFER_SIZE);
             var newGroupCreated = System.currentTimeMillis();
             for (;;) {
                 try {
