@@ -80,6 +80,7 @@ public class TaskBuilder {
                                                                 .build()
                                                 )
                                                 .setHostname(request.getRequest().getNodeName())
+                                                .setType(Protos.ContainerInfo.Type.DOCKER)
                                                 .build()
                                 )
                                 .build();

@@ -1,8 +1,10 @@
 package org.ka.menkins.queue;
 
 import lombok.Value;
+import lombok.With;
 
 @Value
+@With
 public class NodeRequest {
     String id;
     String nodeName;

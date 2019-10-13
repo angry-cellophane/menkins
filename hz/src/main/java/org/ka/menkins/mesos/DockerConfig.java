@@ -1,10 +1,12 @@
 package org.ka.menkins.mesos;
 
 import lombok.Value;
+import lombok.With;
 import org.apache.mesos.Protos;
 import org.ka.menkins.queue.MesosResources;
 
 @Value
+@With
 public class DockerConfig {
     MesosResources resources;
     String dockerImage;

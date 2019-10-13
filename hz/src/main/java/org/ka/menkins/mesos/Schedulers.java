@@ -36,7 +36,16 @@ public class Schedulers {
                     new AtomicBoolean(false),
                     new AtomicReference<>(null));
 
-            var offersProcessor = new OffersProcessor(config, state);
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                var driver = state.getDriver().get();
+                if (driver != null) {
+                    log.info("stopping driver");
+                    driver.stop(false);
+                    log.info("driver stopped");
+                }
+            }));
+
+            var offersProcessor = new OffersProcessor(config.getMesos(), state);
             var scheduler = new MenkinsScheduler(offersProcessor);
 
             var driver = new MesosSchedulerDriver(scheduler, newFrameworkInfo(config), config.getMesos().getMesosMasterUrl());
