@@ -43,6 +43,8 @@ public class OfferRequestMatcher {
         return List.of(request.getImage().getResources().getRole(), ALL_ROLES).stream()
                 .anyMatch(role -> {
                     var offerResource = resourcesByRole.get(role);
+                    if (offerResource == null) return false;
+
                     return offerResource.greaterThan(request.getImage().getResources());
                 });
     }
