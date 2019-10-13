@@ -1,18 +1,5 @@
-repositories {
-  mavenLocal()
-  mavenCentral()
-}
-
-
-apply plugin: 'java'
-
-sourceCompatibility = 11
-targetCompatibility = 11
-
 dependencies {
-    compileOnly 'org.projectlombok:lombok:1.18.10'
-    annotationProcessor 'org.projectlombok:lombok:1.18.10'
+    compileOnly libraries.lombok
+    annotationProcessor libraries.lombok
 }
-
-jar { }
 
