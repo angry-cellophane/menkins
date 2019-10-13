@@ -1,5 +1,6 @@
 package org.ka.menkins.mesos;
 
+import lombok.Builder;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.mesos.MesosSchedulerDriver;
@@ -32,7 +33,7 @@ public class Schedulers {
         return () -> {
             log.info("Initializing driver");
 
-            var state = new State(new ArrayBlockingQueue<>(5),
+            var state = new State(new ArrayBlockingQueue<>(1),
                     new AtomicBoolean(false),
                     new AtomicReference<>(null));
 
@@ -52,7 +53,11 @@ public class Schedulers {
             state.driver.set(driver);
             startDriver(driver);
 
-            startBufferThread(state, globalQueue);
+            var timing = TimingConfiguration.builder()
+                    .bufferFlushIntervalMs(TimeUnit.SECONDS.toMillis(5))
+                    .globalQueueTimeoutMs(TimeUnit.SECONDS.toMillis(1))
+                    .build();
+            startBufferThread(newBufferHandler(state, globalQueue, timing));
 
             log.info("driver initialized");
         };
@@ -82,21 +87,37 @@ public class Schedulers {
         thread.start();
     }
 
-    private static void startBufferThread(State state, BlockingQueue<NodeRequestWithResources> globalQueue) {
-        var BUFFER_SIZE = 5;
-        var TIME_LIMIT = TimeUnit.SECONDS.toMillis(5);
-        var thread = new Thread(() -> {
-            var local = new ArrayList<NodeRequestWithResources>(BUFFER_SIZE);
+
+    @Value
+    @Builder
+    static class TimingConfiguration {
+        long globalQueueTimeoutMs;
+        long bufferFlushIntervalMs;
+    }
+
+    static Runnable newBufferHandler(State state, BlockingQueue<NodeRequestWithResources> globalQueue, TimingConfiguration timing) {
+        return () -> {
+            var BUFFER_SIZE = 5;
+            var QUEUE_TIMEOUT = timing.globalQueueTimeoutMs;
+            var TIME_LIMIT = timing.globalQueueTimeoutMs;
+            var buffer = new ArrayList<NodeRequestWithResources>(BUFFER_SIZE);
             var newGroupCreated = System.currentTimeMillis();
+
+            NodeRequestWithResources value = null;
             for (;;) {
                 try {
-                    var value = globalQueue.poll(1, TimeUnit.SECONDS);
-                    if (value != null) local.add(value);
+                    value = null;
+                    try {
+                        value = globalQueue.poll(QUEUE_TIMEOUT, TimeUnit.MILLISECONDS);
+                    } catch (InterruptedException e) {
+                        // nothing in global queue in 1 second, move on to check if it needs to flush the buffer.
+                    }
+                    if (value != null) buffer.add(value);
 
-                    var size = local.size();
+                    var size = buffer.size();
                     if (size > 0 && (size >= BUFFER_SIZE || (System.currentTimeMillis() - newGroupCreated > TIME_LIMIT))) {
-                        state.localQueue.add(local);
-                        local = new ArrayList<>(BUFFER_SIZE);
+                        state.localQueue.add(buffer);
+                        buffer = new ArrayList<>(BUFFER_SIZE);
                         newGroupCreated = System.currentTimeMillis();
 
                         if (state.suppress.get()) {
@@ -108,7 +129,11 @@ public class Schedulers {
                     log.error("error in global queue to local thread", e);
                 }
             }
-        });
+        };
+    }
+
+    private static void startBufferThread(Runnable handler) {
+        var thread = new Thread(handler);
         thread.setName("global-to-local-queue");
         thread.setDaemon(true);
         thread.start();
