@@ -58,7 +58,7 @@ public class OfferRequestMatcher {
             if (resources == null) continue;
 
             if (resources.greaterThan(request.getImage().getResources())) {
-                this.resourcesByRole.put(role, resources.substract(request.getImage().getResources()));
+                this.resourcesByRole.put(role, resources.subtract(request.getImage().getResources()));
                 this.acceptedRequests.add(request);
                 break;
             }
