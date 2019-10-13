@@ -10,4 +10,9 @@ import org.ka.menkins.mesos.DockerConfig;
 public class NodeRequestWithResources {
     NodeRequest request;
     DockerConfig image;
+
+    public static NodeRequestWithResources from(NodeRequest request) {
+        var docker = ResourcesByLabelsLookup.lookup(request.getLabels());
+        return new NodeRequestWithResources(request, docker);
+    }
 }

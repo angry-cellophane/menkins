@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import org.apache.mesos.MesosNativeLibrary;
 import org.ka.menkins.mesos.Schedulers;
 import org.ka.menkins.queue.NodeRequest;
+import org.ka.menkins.queue.NodeRequestWithResources;
 import org.ka.menkins.queue.RequestsQueue;
 
 import static spark.Spark.awaitInitialization;
@@ -53,7 +54,7 @@ public class App {
 
                 var node = Json.from(request.bodyAsBytes(), NodeRequest.class);
                 node.validate();
-                queue.add(node.toWithResources());
+                queue.add(NodeRequestWithResources.from(node));
 
                 return "";
             }));

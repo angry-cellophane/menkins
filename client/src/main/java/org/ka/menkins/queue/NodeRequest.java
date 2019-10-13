@@ -32,9 +32,4 @@ public class NodeRequest {
             throw new RuntimeException("jnlp url is null in builder node request");
         }
     }
-
-    public NodeRequestWithResources toWithResources() {
-        var docker = ResourcesByLabelsLookup.lookup(this.labels);
-        return new NodeRequestWithResources(this, docker);
-    }
 }

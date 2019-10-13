@@ -1,0 +1,4 @@
+rootProject.name = 'menkins-parent'
+
+//include 'server'
+//include 'client'
