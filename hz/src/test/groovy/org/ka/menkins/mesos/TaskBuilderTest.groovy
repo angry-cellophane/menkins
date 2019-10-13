@@ -38,4 +38,29 @@ class TaskBuilderTest extends Specification implements MesosHelpers {
         then:
         tasks.size() == 1
     }
+
+    void 'one offer with two request => two tasks'() {
+        given:
+        def builder = TaskBuilder.newTaskBuilder(MESOS_CONFIG)
+        def matcher = matcher {
+            cpus = 2.0
+            mem = 512
+            role = '*'
+        }
+
+        when:
+        2.times {
+            matcher.accept(
+                    request {
+                        docker {
+                            withResources(mesosResource(0.2, 128, '*'))
+                        }
+                    }
+            )
+        }
+        def tasks = builder.apply(matcher)
+
+        then:
+        tasks.size() == 2
+    }
 }
