@@ -7,7 +7,9 @@ import spock.lang.Specification
 import java.util.concurrent.ArrayBlockingQueue
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
@@ -16,6 +18,7 @@ class BufferExchangeTest extends Specification implements MesosHelpers {
     static final Schedulers.TimingConfiguration timing = Schedulers.TimingConfiguration.builder()
             .bufferFlushIntervalMs(200)
             .globalQueueTimeoutMs(100)
+            .bufferFlushIntervalMs(100)
             .build();
 
     BlockingQueue<NodeRequestWithResources> globalQueue

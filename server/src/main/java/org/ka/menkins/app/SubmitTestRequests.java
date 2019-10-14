@@ -3,14 +3,13 @@ package org.ka.menkins.app;
 import org.ka.menkins.queue.NodeRequest;
 import org.ka.menkins.queue.NodeRequestWithResources;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 
 public class SubmitTestRequests {
     public static void doSubmit(BlockingQueue<NodeRequestWithResources> queue) {
-        var node = node("agent1");
-
-        queue.add(node);
+        List.of(node("agent1"), node("agent2")).forEach(node -> queue.add(node));
     }
 
     static NodeRequestWithResources node(String name) {
@@ -24,6 +23,7 @@ public class SubmitTestRequests {
                 .jnlpArgs("-noReconnect")
                 .jnlpSecret("")
                 .jnlpUrl("http://172.28.128.1:8080/computer/agent1/slave-agent.jnlp")
+                .slaveJarUrl("http://172.28.128.1:8080/jnlpJars/slave.jar")
                 .build()
         );
     }

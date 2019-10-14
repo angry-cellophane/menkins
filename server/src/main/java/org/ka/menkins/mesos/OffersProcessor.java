@@ -9,6 +9,8 @@ import org.ka.menkins.queue.NodeRequestWithResources;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -17,19 +19,25 @@ import java.util.stream.Collectors;
 public class OffersProcessor implements Consumer<List<Protos.Offer>> {
 
     AppConfig.Mesos config;
-    Schedulers.State state;
+    BlockingQueue<List<NodeRequestWithResources>> queue;
+    AtomicReference<Schedulers.DriverState> stateRef;
 
     @Override
     public void accept(List<Protos.Offer> offers) {
         log.info("processing " + offers.size() + " offers");
-        var driver = state.getDriver().get();
+        var state = stateRef.get();
+        var driver = state.getDriver();
+        if (driver == null) {
+            throw new IllegalStateException("driver cannot be null");
+        }
         var declineOffer = declineOfferClosure(driver);
 
-        var requests = state.getLocalQueue().poll();
+        var requests = queue.poll();
         log.info("found " + (requests == null ? 0 : requests.size()) + " requests");
         if (requests == null) {
             offers.stream().map(Protos.Offer::getId).forEach(declineOffer);
             driver.suppressOffers();
+            stateRef.set(state.withSuppressed(true));
             log.info("framework suppressed as there were no builder node requests");
             return;
         }

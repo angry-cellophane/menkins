@@ -6,7 +6,9 @@ import org.apache.mesos.MesosNativeLibrary;
 import org.ka.menkins.mesos.Schedulers;
 import org.ka.menkins.queue.NodeRequest;
 import org.ka.menkins.queue.NodeRequestWithResources;
-import org.ka.menkins.queue.RequestsQueue;
+import org.ka.menkins.queue.Storage;
+
+import java.util.concurrent.Executors;
 
 import static spark.Spark.awaitInitialization;
 import static spark.Spark.get;
@@ -29,7 +31,7 @@ public class App {
                                 .role("*")
                                 .slaveUser("nobody")
                                 .frameworkName("menkins-" + id)
-                                .mesosMasterUrl("172.28.128.7:5050")
+                                .mesosMasterUrl("172.28.128.13:5050")
                                 .checkpoint(true)
                                 .build()
                 )
@@ -45,7 +47,9 @@ public class App {
         validate();
         Metrics.Requests.total.get();
 
-        var queue = RequestsQueue.getQueue(config.getHazelcast());
+        var storage = Storage.newLocalStorageManager();
+        var createRequests = storage.createNodeRequests();
+        var aggregatedCreateRequests = storage.aggregatedCreateNodeRequests();
 
         port(config.getPort());
         path("/api/v1", () -> {
@@ -54,7 +58,7 @@ public class App {
 
                 var node = Json.from(request.bodyAsBytes(), NodeRequest.class);
                 node.validate();
-                queue.add(NodeRequestWithResources.from(node));
+                createRequests.add(NodeRequestWithResources.from(node));
 
                 return "";
             }));
@@ -67,8 +71,21 @@ public class App {
             return "";
         }));
 
-        Schedulers.newInitializer(config, queue).run();
-        SubmitTestRequests.doSubmit(queue);
+        var aggregatorPool = Executors.newSingleThreadExecutor(runnable -> {
+            var t = new Thread(runnable);
+            t.setDaemon(true);
+            t.setName("menkins-aggregator-thread");
+            return t;
+        });
+
+        var storageConfig = Storage.StorageConfiguration.builder()
+                .bufferSize(5)
+                .build();
+
+        var aggregator = RequestsAggregator.newAggregatorInitializer(aggregatorPool, storageConfig, storage);
+        Schedulers.newInitializer(config, aggregatedCreateRequests, aggregator).run();
+
+        SubmitTestRequests.doSubmit(createRequests);
 
         awaitInitialization();
     }

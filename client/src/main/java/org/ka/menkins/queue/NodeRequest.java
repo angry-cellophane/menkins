@@ -12,25 +12,26 @@ public class NodeRequest {
     String nodeName;
     String labels;
     String jenkinsUrl;
-    String jnlpUrl;
     String jnlpSecret;
     String jnlpArgs;
+    String slaveJarUrl;
+    String jnlpUrl;
 
     public void validate() {
         if (nodeName == null) {
-            throw new RuntimeException("node name is null in request from " + jnlpUrl);
+            throw new RuntimeException("node name is null in request from " + jenkinsUrl);
         }
 
         if (labels == null) {
-            throw new RuntimeException("labels is null in request from " + jnlpUrl);
+            throw new RuntimeException("labels is null in request from " + jenkinsUrl);
         }
 
         if (jnlpSecret == null) {
-            throw new RuntimeException("jnlp secret is null in request from " + jnlpUrl);
+            throw new RuntimeException("jnlp secret is null in request from " + jenkinsUrl);
         }
 
-        if (jnlpUrl == null) {
-            throw new RuntimeException("jnlp url is null in builder node request");
+        if (slaveJarUrl == null) {
+            throw new RuntimeException("slaveJarUrl url is null in request from " + jenkinsUrl);
         }
     }
 }

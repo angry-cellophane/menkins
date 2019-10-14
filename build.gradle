@@ -29,7 +29,7 @@ subprojects {
     targetCompatibility = 11
 
     test {
-        useJUnitPlatform()
+//        useJUnitPlatform()
         testLogging {
             events "passed", "skipped", "failed"
         }

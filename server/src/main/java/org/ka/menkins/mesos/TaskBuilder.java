@@ -2,6 +2,7 @@ package org.ka.menkins.mesos;
 
 import org.apache.mesos.Protos;
 import org.ka.menkins.app.AppConfig;
+import org.ka.menkins.queue.NodeRequest;
 
 import java.util.List;
 import java.util.function.Function;
@@ -30,7 +31,7 @@ public class TaskBuilder {
                         var command = Protos.CommandInfo.newBuilder()
                                 .setValue(startJenkins)
                                 .addUris(
-                                        Protos.CommandInfo.URI.newBuilder().setValue(request.getRequest().getJnlpUrl())
+                                        Protos.CommandInfo.URI.newBuilder().setValue(request.getRequest().getSlaveJarUrl())
                                                 .setExecutable(false)
                                                 .setExtract(false)
                                                 .build()
@@ -69,23 +70,29 @@ public class TaskBuilder {
                                                 )
                                                 .build()
                                 )
-                                .setContainer(
-                                        Protos.ContainerInfo.newBuilder()
-                                                .setDocker(
-                                                        Protos.ContainerInfo.DockerInfo.newBuilder()
-                                                                .setImage(docker.getDockerImage())
-                                                                .setForcePullImage(docker.isForcePull())
-                                                                .setPrivileged(docker.isPrivileged())
-                                                                .setNetwork(docker.getNetworking())
-                                                                .build()
-                                                )
-                                                .setHostname(request.getRequest().getNodeName())
-                                                .setType(Protos.ContainerInfo.Type.DOCKER)
-                                                .build()
-                                )
+                                .setContainer(newContainerInfo(request.getRequest(), docker))
                                 .build();
                     }).collect(Collectors.toList());
         };
+    }
+
+    static Protos.ContainerInfo newContainerInfo(NodeRequest request, DockerConfig config) {
+        var builder = Protos.ContainerInfo.newBuilder()
+                .setDocker(
+                        Protos.ContainerInfo.DockerInfo.newBuilder()
+                                .setImage(config.getDockerImage())
+                                .setForcePullImage(config.isForcePull())
+                                .setPrivileged(config.isPrivileged())
+                                .setNetwork(config.getNetworking())
+                                .build()
+                )
+                .setType(Protos.ContainerInfo.Type.DOCKER);
+
+        if (config.getNetworking() == Protos.ContainerInfo.DockerInfo.Network.HOST) {
+            builder.setHostname(request.getNodeName());
+        }
+
+        return builder.build();
     }
 
     private TaskBuilder() {}
