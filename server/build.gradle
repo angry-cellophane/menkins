@@ -3,6 +3,9 @@ apply plugin: 'application'
 
 mainClassName = 'org.ka.menkins.app.App'
 
+sourceCompatibility = 11
+targetCompatibility = 11
+
 dependencies {
     compile project(':menkins-client')
 

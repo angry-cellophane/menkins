@@ -13,23 +13,19 @@ import java.util.concurrent.atomic.AtomicReference
 class OffersProcessorTest extends Specification implements MesosHelpers {
 
     BlockingQueue<List<NodeRequestWithResources>> queue
-    AtomicBoolean suppress
-    AtomicReference<SchedulerDriver> driverRef
-    Schedulers.State state
     OffersProcessor offersProcessor
+    AtomicReference<Schedulers.DriverState> stateRef
 
     void setup() {
         queue = new LinkedBlockingQueue<List<NodeRequestWithResources>>()
-        suppress = new AtomicBoolean(false)
-        driverRef = new AtomicReference<>(null)
-        state = new Schedulers.State(queue, suppress, driverRef)
-        offersProcessor = new OffersProcessor(MESOS_CONFIG, state)
+        stateRef = new AtomicReference<>(new Schedulers.DriverState(null, false))
+        offersProcessor = new OffersProcessor(MESOS_CONFIG, queue, stateRef)
     }
 
     void 'suppress framework when no requests'() {
         given:
         def driver = Mock(SchedulerDriver)
-        driverRef.set(driver)
+        stateRef.set(stateRef.get().withDriver(driver))
 
         def offers = [offer(), offer()]
 
@@ -43,7 +39,7 @@ class OffersProcessorTest extends Specification implements MesosHelpers {
     void 'sufficient resources, same role'() {
         given:
         def driver = Mock(SchedulerDriver)
-        driverRef.set(driver)
+        stateRef.set(stateRef.get().withDriver(driver))
 
         def requests = [request {
             docker {
@@ -70,7 +66,7 @@ class OffersProcessorTest extends Specification implements MesosHelpers {
     void 'sufficient resources, * role in offer'() {
         given:
         def driver = Mock(SchedulerDriver)
-        driverRef.set(driver)
+        stateRef.set(stateRef.get().withDriver(driver))
 
         def requests = [request {
             docker {
@@ -97,7 +93,7 @@ class OffersProcessorTest extends Specification implements MesosHelpers {
     void 'no sufficient resources in offer, no tasks'() {
         given:
         def driver = Mock(SchedulerDriver)
-        driverRef.set(driver)
+        stateRef.set(stateRef.get().withDriver(driver))
 
         def requests = [request {
             docker {
@@ -125,7 +121,7 @@ class OffersProcessorTest extends Specification implements MesosHelpers {
     void 'two tasks for offer#1, one task for offer#2'() {
         given:
         def driver = Mock(SchedulerDriver)
-        driverRef.set(driver)
+        stateRef.set(stateRef.get().withDriver(driver))
 
         def requests = (1 .. 3).collect {
             request {
