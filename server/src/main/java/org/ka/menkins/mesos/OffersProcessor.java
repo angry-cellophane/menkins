@@ -49,6 +49,7 @@ public class OffersProcessor implements Consumer<List<Protos.Offer>> {
         matched.forEach(matcher -> {
             var tasks = taskBuilder.apply(matcher);
             if (!tasks.isEmpty()) {
+                log.info("offer " + matcher.getOffer().getId().getValue() + " used to start tasks " + tasks);
                 driver.launchTasks(Collections.singletonList(matcher.getOffer().getId()), tasks);
             }
         });

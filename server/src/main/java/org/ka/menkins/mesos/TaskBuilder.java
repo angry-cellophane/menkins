@@ -30,7 +30,7 @@ public class TaskBuilder {
                         var command = Protos.CommandInfo.newBuilder()
                                 .setValue(startJenkins)
                                 .addUris(
-                                        Protos.CommandInfo.URI.newBuilder().setValue(request.getRequest().getJnlpJarUrl())
+                                        Protos.CommandInfo.URI.newBuilder().setValue(request.getRequest().getJnlpUrl())
                                                 .setExecutable(false)
                                                 .setExtract(false)
                                                 .build()

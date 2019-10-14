@@ -1,17 +1,18 @@
 package org.ka.menkins.queue;
 
+import lombok.Builder;
 import lombok.Value;
 import lombok.With;
 
 @Value
 @With
+@Builder
 public class NodeRequest {
     String id;
     String nodeName;
     String labels;
     String jenkinsUrl;
     String jnlpUrl;
-    String jnlpJarUrl;
     String jnlpSecret;
     String jnlpArgs;
 

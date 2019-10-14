@@ -68,7 +68,7 @@ public class App {
         }));
 
         Schedulers.newInitializer(config, queue).run();
-
+        SubmitTestRequests.doSubmit(queue);
 
         awaitInitialization();
     }

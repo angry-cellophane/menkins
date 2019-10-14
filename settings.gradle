@@ -2,5 +2,6 @@ rootProject.name = 'menkins-parent'
 
 include 'server'
 include 'client'
+//include 'plugin'
 
 rootProject.children.each { it.name = "menkins-${it.name}"}
