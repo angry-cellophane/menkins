@@ -1,4 +1,4 @@
-package org.ka.menkins.queue
+package org.ka.menkins.storage
 
 import org.ka.menkins.mesos.MesosHelpers
 import spock.lang.Specification

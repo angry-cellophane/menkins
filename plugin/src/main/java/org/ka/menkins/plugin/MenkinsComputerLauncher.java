@@ -6,13 +6,15 @@ import hudson.slaves.JNLPLauncher;
 import hudson.slaves.SlaveComputer;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.ka.menkins.queue.NodeRequest;
+import org.ka.menkins.storage.NodeRequest;
 
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class MenkinsComputerLauncher extends JNLPLauncher {
@@ -69,26 +71,39 @@ public class MenkinsComputerLauncher extends JNLPLauncher {
                     LOGGER.info("Successfully submitted request to spin up " + this.name);
                 }
             }
+
+            int iter = 1000;
+            while (iter > 0 && computer.isOffline() && computer.isConnecting()) {
+                try {
+                    LOGGER.info("Waiting for slave computer connection " + name);
+                    Thread.sleep(5000);
+                } catch (InterruptedException ignored) { return; }
+                iter--;
+            }
+            if (computer.isOnline()) {
+                LOGGER.info("menkins node connected " + name);
+            } else {
+                LOGGER.warning("menkins node not connected " + name);
+            }
         } catch (Exception e) {
             LOGGER.warning("error when trying to launch " + name);
-        }
-
-        int iter = 1000;
-        while (iter > 0 && computer.isOffline() && computer.isConnecting()) {
-            try {
-                LOGGER.info("Waiting for slave computer connection " + name);
-                Thread.sleep(5000);
-            } catch (InterruptedException ignored) { return; }
-            iter--;
-        }
-        if (computer.isOnline()) {
-            LOGGER.info("menkins node connected " + name);
-        } else {
-            LOGGER.warning("menkins node not connected " + name);
         }
     }
 
     public void terminate() {
-        // todo
+        LOGGER.info("Sending request to terminate task " + this.uuid + ", node " + this.name);
+
+        HttpDelete request = new HttpDelete(URL + "/" + this.uuid);
+        try {
+            try (CloseableHttpResponse response = HTTP.execute(request)) {
+                if (response.getStatusLine().getStatusCode() != 200) {
+                    LOGGER.warning("Terminating node " + this.name + " failed. Server returned " + response.getStatusLine().getStatusCode() + " " + IOUtils.toString(response.getEntity().getContent()));
+                } else {
+                    LOGGER.info("Successfully terminated node " + this.name);
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error while trying to delete task " + this.uuid + ", node " + this.name, e);
+        }
     }
 }

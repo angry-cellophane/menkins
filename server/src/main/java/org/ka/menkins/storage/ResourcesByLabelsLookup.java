@@ -1,4 +1,4 @@
-package org.ka.menkins.queue;
+package org.ka.menkins.storage;
 
 import org.apache.mesos.Protos;
 import org.ka.menkins.mesos.DockerConfig;

@@ -1,4 +1,4 @@
-package org.ka.menkins.queue;
+package org.ka.menkins.storage;
 
 import lombok.Value;
 import lombok.With;

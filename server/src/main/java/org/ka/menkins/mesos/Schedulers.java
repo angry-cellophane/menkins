@@ -1,5 +1,6 @@
 package org.ka.menkins.mesos;
 
+import com.hazelcast.core.ITopic;
 import lombok.Value;
 import lombok.With;
 import lombok.extern.slf4j.Slf4j;
@@ -7,7 +8,7 @@ import org.apache.mesos.MesosSchedulerDriver;
 import org.apache.mesos.Protos;
 import org.apache.mesos.SchedulerDriver;
 import org.ka.menkins.app.AppConfig;
-import org.ka.menkins.queue.NodeRequestWithResources;
+import org.ka.menkins.storage.NodeRequestWithResources;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
@@ -26,7 +27,8 @@ public class Schedulers {
 
     public static Runnable newInitializer(AppConfig config,
                                           BlockingQueue<List<NodeRequestWithResources>> aggregatedCreateRequestsQueue,
-                                          Consumer<AtomicReference<DriverState>> aggregatorInitializer) {
+                                          Consumer<AtomicReference<DriverState>> aggregatorInitializer,
+                                          ITopic<String> terminateTasksTopic) {
         return () -> {
             log.info("Initializing driver");
 
@@ -49,6 +51,7 @@ public class Schedulers {
             startDriver(driver);
 
             aggregatorInitializer.accept(stateRef);
+            terminateTasksTopic.addMessageListener(TerminateTask.newKiller(stateRef));
 
             log.info("driver initialized");
         };

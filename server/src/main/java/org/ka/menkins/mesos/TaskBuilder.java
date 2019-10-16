@@ -2,7 +2,7 @@ package org.ka.menkins.mesos;
 
 import org.apache.mesos.Protos;
 import org.ka.menkins.app.AppConfig;
-import org.ka.menkins.queue.NodeRequest;
+import org.ka.menkins.storage.NodeRequest;
 
 import java.util.List;
 import java.util.function.Function;

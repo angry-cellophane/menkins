@@ -2,8 +2,8 @@ package org.ka.menkins.app;
 
 import lombok.extern.slf4j.Slf4j;
 import org.ka.menkins.mesos.Schedulers;
-import org.ka.menkins.queue.NodeRequestWithResources;
-import org.ka.menkins.queue.Storage;
+import org.ka.menkins.storage.NodeRequestWithResources;
+import org.ka.menkins.storage.Storage;
 
 import java.util.ArrayList;
 import java.util.List;

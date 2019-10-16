@@ -4,7 +4,7 @@ import com.hazelcast.config.Config;
 import lombok.AllArgsConstructor;
 import org.apache.mesos.MesosNativeLibrary;
 import org.ka.menkins.mesos.Schedulers;
-import org.ka.menkins.queue.Storage;
+import org.ka.menkins.storage.Storage;
 
 import java.util.concurrent.Executors;
 
@@ -42,8 +42,9 @@ public class App {
         var storage = Storage.newLocalStorageManager();
         var createRequests = storage.createNodeRequests();
         var aggregatedCreateRequests = storage.aggregatedCreateNodeRequests();
+        var terminateTaskRequests = storage.terminateTaskRequestsTopic();
 
-        HttpServer.newInitializer(config, createRequests).run();
+        HttpServer.newInitializer(config, createRequests, terminateTaskRequests).run();
 
         var aggregatorPool = Executors.newSingleThreadExecutor(runnable -> {
             var t = new Thread(runnable);
@@ -57,7 +58,7 @@ public class App {
                 .build();
 
         var aggregator = RequestsAggregator.newAggregatorInitializer(aggregatorPool, storageConfig, storage);
-        Schedulers.newInitializer(config, aggregatedCreateRequests, aggregator).run();
+        Schedulers.newInitializer(config, aggregatedCreateRequests, aggregator, terminateTaskRequests).run();
     }
 
     private void validate() {

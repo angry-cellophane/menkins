@@ -3,7 +3,7 @@ package org.ka.menkins.mesos;
 import lombok.Value;
 import lombok.With;
 import org.apache.mesos.Protos;
-import org.ka.menkins.queue.MesosResources;
+import org.ka.menkins.storage.MesosResources;
 
 @Value
 @With

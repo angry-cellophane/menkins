@@ -1,7 +1,7 @@
 package org.ka.menkins.app;
 
-import org.ka.menkins.queue.NodeRequest;
-import org.ka.menkins.queue.NodeRequestWithResources;
+import org.ka.menkins.storage.NodeRequest;
+import org.ka.menkins.storage.NodeRequestWithResources;
 
 import java.util.List;
 import java.util.UUID;

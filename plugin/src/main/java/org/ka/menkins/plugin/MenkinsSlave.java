@@ -26,7 +26,7 @@ public class MenkinsSlave extends Slave  {
                 Mode.EXCLUSIVE,
                 labels,
                 new MenkinsComputerLauncher(name, labels),
-                new MenkinsRetentionStrategy(15),
+                new MenkinsRetentionStrategy(3),
                 Collections.emptyList());
     }
 
@@ -35,7 +35,6 @@ public class MenkinsSlave extends Slave  {
     }
 
     public void terminate() {
-        getComputer();
         LOGGER.info("terminating menkins slave " + this.getNodeName());
         try {
             Jenkins.getInstance().removeNode(this);

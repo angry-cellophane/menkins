@@ -2,8 +2,8 @@ package org.ka.menkins.mesos;
 
 import lombok.Getter;
 import org.apache.mesos.Protos;
-import org.ka.menkins.queue.MesosResources;
-import org.ka.menkins.queue.NodeRequestWithResources;
+import org.ka.menkins.storage.MesosResources;
+import org.ka.menkins.storage.NodeRequestWithResources;
 
 import java.util.ArrayList;
 import java.util.Collection;
