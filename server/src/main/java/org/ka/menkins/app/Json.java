@@ -14,4 +14,12 @@ public class Json {
             throw new RuntimeException(e);
         }
     }
+
+    public static byte[] toBytes(Object object) {
+        try {
+            return MAPPER.writeValueAsBytes(object);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

@@ -1,11 +1,13 @@
 package org.ka.menkins.queue;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
 import lombok.With;
 
 @Value
 @With
+@AllArgsConstructor
 @Builder
 public class NodeRequest {
     String id;
@@ -32,6 +34,10 @@ public class NodeRequest {
 
         if (slaveJarUrl == null) {
             throw new RuntimeException("slaveJarUrl url is null in request from " + jenkinsUrl);
+        }
+
+        if (jenkinsUrl == null) {
+            throw new RuntimeException("slaveJarUrl url is null in request " + nodeName);
         }
     }
 }

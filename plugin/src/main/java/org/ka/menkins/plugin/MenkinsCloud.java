@@ -1,8 +1,10 @@
 package org.ka.menkins.plugin;
 
+import hudson.Extension;
 import hudson.init.InitMilestone;
 import hudson.init.Initializer;
 import hudson.model.Computer;
+import hudson.model.Descriptor;
 import hudson.model.Label;
 import hudson.slaves.Cloud;
 import hudson.slaves.NodeProvisioner.PlannedNode;
@@ -10,6 +12,7 @@ import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -42,6 +45,7 @@ public class MenkinsCloud extends Cloud {
             String labels = label.getExpression().replaceAll("&", "");
             String nodeName = buildNodeName(labels);
             MenkinsSlave slave = new MenkinsSlave(nodeName, labels);
+            LOGGER.info("toComputer = " + slave.toComputer());
             nodes.add(new PlannedNode(this.getDisplayName(), Computer.threadPoolForRemoting
                     .submit(() -> {
                         // We do not need to explicitly add the Node here because that is handled by
@@ -71,5 +75,20 @@ public class MenkinsCloud extends Cloud {
             suffix = StringUtils.remove("-" + label, " ").replace("&", "");
         }
         return StringUtils.left("menkins-jenkins-" + StringUtils.remove(UUID.randomUUID().toString(), '-') + suffix, MAX_HOSTNAME_LENGTH);
+    }
+
+
+    @Extension
+    public static class DescriptorImpl extends Descriptor<Cloud> {
+
+        public DescriptorImpl() {
+            super(MenkinsCloud.class);
+        }
+
+        @Nonnull
+        @Override
+        public String getDisplayName() {
+            return "Menkins Cloud";
+        }
     }
 }

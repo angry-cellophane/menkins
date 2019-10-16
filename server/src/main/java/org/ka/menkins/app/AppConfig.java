@@ -21,8 +21,8 @@ public class AppConfig {
         boolean checkpoint;
     }
 
-    Mesos mesos;
+    @NonNull Mesos mesos;
     int port;
     @NonNull String url;
-    Config hazelcast;
+    @NonNull Config hazelcast;
 }

@@ -1,16 +1,21 @@
 package org.ka.menkins.plugin;
 
+import hudson.Extension;
+import hudson.model.Computer;
 import hudson.model.Descriptor;
 import hudson.model.Slave;
 import hudson.slaves.ComputerLauncher;
 import jenkins.model.Jenkins;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class MenkinsSlave extends Slave  {
+    private static final long serialVersionUID = 1L;
+
     private static final Logger LOGGER = Logger.getLogger(MenkinsSlave.class.getName());
 
     public MenkinsSlave(String name, String labels) throws Descriptor.FormException, IOException {
@@ -21,7 +26,7 @@ public class MenkinsSlave extends Slave  {
                 Mode.EXCLUSIVE,
                 labels,
                 new MenkinsComputerLauncher(name, labels),
-                new MenkinsRetentionStrategy(),
+                new MenkinsRetentionStrategy(15),
                 Collections.emptyList());
     }
 
@@ -30,6 +35,7 @@ public class MenkinsSlave extends Slave  {
     }
 
     public void terminate() {
+        getComputer();
         LOGGER.info("terminating menkins slave " + this.getNodeName());
         try {
             Jenkins.getInstance().removeNode(this);
@@ -41,6 +47,20 @@ public class MenkinsSlave extends Slave  {
             }
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Failed to terminate Menkins instance: " + getNodeName(), e);
+        }
+    }
+
+    @Override
+    public Computer createComputer() {
+        return new MenkinsComputer(this);
+    }
+
+    @Extension
+    public static class DescriptorImpl extends SlaveDescriptor {
+        @Nonnull
+        @Override
+        public String getDisplayName() {
+            return "Menkins slave";
         }
     }
 }
