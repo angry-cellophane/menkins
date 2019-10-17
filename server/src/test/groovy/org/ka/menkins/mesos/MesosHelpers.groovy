@@ -4,11 +4,11 @@ package org.ka.menkins.mesos
 import org.apache.mesos.Protos
 import org.apache.mesos.Protos.Offer
 import org.apache.mesos.Protos.Resource
-import org.ka.menkins.app.AppConfig
-import org.ka.menkins.queue.MesosResources
-import org.ka.menkins.queue.NodeRequest
-import org.ka.menkins.queue.NodeRequestWithResources
-import org.ka.menkins.queue.ResourcesByLabelsLookup
+import org.ka.menkins.app.init.AppConfig
+import org.ka.menkins.storage.MesosResources
+import org.ka.menkins.storage.NodeRequest
+import org.ka.menkins.storage.NodeRequestWithResources
+import org.ka.menkins.storage.ResourcesByLabelsLookup
 
 trait MesosHelpers {
     static final AppConfig.Mesos MESOS_CONFIG = new AppConfig.Mesos(

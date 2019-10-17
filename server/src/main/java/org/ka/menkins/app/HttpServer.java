@@ -2,6 +2,7 @@ package org.ka.menkins.app;
 
 import com.hazelcast.core.ITopic;
 import io.prometheus.client.exporter.MetricsServlet;
+import org.ka.menkins.app.init.AppConfig;
 import org.ka.menkins.storage.NodeRequest;
 import org.ka.menkins.storage.NodeRequestWithResources;
 

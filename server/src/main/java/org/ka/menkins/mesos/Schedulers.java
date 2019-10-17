@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.mesos.MesosSchedulerDriver;
 import org.apache.mesos.Protos;
 import org.apache.mesos.SchedulerDriver;
-import org.ka.menkins.app.AppConfig;
+import org.ka.menkins.app.init.AppConfig;
 import org.ka.menkins.storage.NodeRequestWithResources;
 
 import java.util.List;
@@ -58,12 +58,13 @@ public class Schedulers {
     }
 
     private static Protos.FrameworkInfo newFrameworkInfo(AppConfig config) {
+        var mesos = config.getMesos();
         return Protos.FrameworkInfo.newBuilder()
-                .setUser(config.getMesos().getSlaveUser())
-                .setName(config.getMesos().getFrameworkName())
-                .setRole(config.getMesos().getRole())
-                .setCheckpoint(config.getMesos().isCheckpoint())
-                .setWebuiUrl(config.getUrl())
+                .setUser(mesos.getSlaveUser())
+                .setName(mesos.getFrameworkName())
+                .setRole(mesos.getRole())
+                .setCheckpoint(mesos.isCheckpoint())
+                .setWebuiUrl(mesos.getWebUiUrl())
                 .build();
     }
 

@@ -1,4 +1,4 @@
-package org.ka.menkins.app;
+package org.ka.menkins.app.init;
 
 import com.hazelcast.config.Config;
 import lombok.Builder;
@@ -9,6 +9,10 @@ import lombok.Value;
 @Builder
 public class AppConfig {
 
+    public static enum StorageType {
+        LOCAL, HAZELCAST
+    }
+
     @Value
     @Builder
     public static class Mesos {
@@ -17,12 +21,13 @@ public class AppConfig {
         @NonNull String slaveUser;
         @NonNull String mesosMasterUrl;
         @NonNull String frameworkName;
+        @NonNull String webUiUrl;
         double refuseInSeconds;
         boolean checkpoint;
     }
 
     @NonNull Mesos mesos;
     int port;
-    @NonNull String url;
+    @NonNull StorageType storageType;
     @NonNull Config hazelcast;
 }

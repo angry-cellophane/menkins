@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.mesos.Protos;
 import org.apache.mesos.SchedulerDriver;
-import org.ka.menkins.app.AppConfig;
+import org.ka.menkins.app.init.AppConfig;
 import org.ka.menkins.storage.NodeRequestWithResources;
 
 import java.util.Collections;

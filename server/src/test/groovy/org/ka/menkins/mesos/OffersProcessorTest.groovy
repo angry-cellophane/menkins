@@ -2,12 +2,11 @@ package org.ka.menkins.mesos
 
 import org.apache.mesos.Protos
 import org.apache.mesos.SchedulerDriver
-import org.ka.menkins.queue.NodeRequestWithResources
+import org.ka.menkins.storage.NodeRequestWithResources
 import spock.lang.Specification
 
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
 class OffersProcessorTest extends Specification implements MesosHelpers {

@@ -1,9 +1,10 @@
 package org.ka.menkins.app
 
 import com.hazelcast.config.Config
+import org.ka.menkins.app.init.AppConfig
 import org.ka.menkins.mesos.MesosHelpers
-import org.ka.menkins.queue.NodeRequest
-import org.ka.menkins.queue.NodeRequestWithResources
+import org.ka.menkins.storage.NodeRequest
+import org.ka.menkins.storage.NodeRequestWithResources
 import spark.Spark
 import spock.lang.Specification
 
