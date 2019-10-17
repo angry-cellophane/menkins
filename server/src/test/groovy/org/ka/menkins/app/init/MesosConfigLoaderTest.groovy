@@ -8,13 +8,13 @@ class MesosConfigLoaderTest extends Specification {
         given:
         def props = new Properties()
         def env = [
-                (MesosConfigLoader.LIB_PATH.envName): '/var/path',
-                (MesosConfigLoader.MASTER_URL.envName): 'master:5050',
-                (MesosConfigLoader.ROLE.envName): '*',
-                (MesosConfigLoader.SLAVE_USER.envName): 'jenkins',
-                (MesosConfigLoader.FRAMEWORK_ID.envName): '1234',
+                (MesosConfigLoader.LIB_PATH.envName)     : '/var/path',
+                (MesosConfigLoader.MASTER_URL.envName)   : 'master:5050',
+                (MesosConfigLoader.ROLE.envName)         : '*',
+                (MesosConfigLoader.SLAVE_USER.envName)   : 'jenkins',
+                (MesosConfigLoader.FRAMEWORK_ID.envName) : '1234',
                 (MesosConfigLoader.CHECKPOINT_ON.envName): 'false',
-                (MesosConfigLoader.WEBUI_URL.envName): 'http://webui',
+                (MesosConfigLoader.WEBUI_URL.envName)    : 'http://webui',
         ]
         def holder = new PropertiesHolder(env, props)
 
@@ -68,9 +68,9 @@ class MesosConfigLoaderTest extends Specification {
         given:
         def props = new Properties()
         def env = [
-                (MesosConfigLoader.LIB_PATH.envName): '/var/path',
+                (MesosConfigLoader.LIB_PATH.envName)  : '/var/path',
                 (MesosConfigLoader.MASTER_URL.envName): 'master:5050',
-                (MesosConfigLoader.ROLE.envName): '*',
+                (MesosConfigLoader.ROLE.envName)      : '*',
                 (MesosConfigLoader.SLAVE_USER.envName): 'jenkins',
         ]
         def holder = new PropertiesHolder(env, props)
@@ -85,5 +85,32 @@ class MesosConfigLoaderTest extends Specification {
             webUiUrl =~ /menkins-.+/
             checkpoint == true
         }
+    }
+
+    void 'fail if mandatory property not defined'() {
+        given:
+        def props = new Properties()
+        def env = [
+                (MesosConfigLoader.LIB_PATH.envName)  : '/var/path',
+                (MesosConfigLoader.MASTER_URL.envName): 'master:5050',
+                (MesosConfigLoader.ROLE.envName)      : '*',
+                (MesosConfigLoader.SLAVE_USER.envName): 'jenkins',
+        ]
+        env.remove(toRemove)
+        def holder = new PropertiesHolder(env, props)
+
+        when:
+        def builder = MesosConfigLoader.load(holder).apply(AppConfig.builder())
+        def mesos = builder.mesos
+
+        then:
+        thrown(PropertiesHolder.PropertyNotFoundException)
+
+        where:
+        toRemove                             | _
+        MesosConfigLoader.LIB_PATH.envName   | _
+        MesosConfigLoader.MASTER_URL.envName | _
+        MesosConfigLoader.ROLE.envName       | _
+        MesosConfigLoader.SLAVE_USER.envName | _
     }
 }
