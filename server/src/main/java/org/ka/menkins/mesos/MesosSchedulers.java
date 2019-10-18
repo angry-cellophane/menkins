@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 @Slf4j
-public class Schedulers {
+public class MesosSchedulers {
 
     @Value
     @With
@@ -82,5 +82,5 @@ public class Schedulers {
         thread.start();
     }
 
-    private Schedulers() {}
+    private MesosSchedulers() {}
 }

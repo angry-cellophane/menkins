@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.apache.mesos.MesosNativeLibrary;
 import org.ka.menkins.app.init.AppConfig;
 import org.ka.menkins.app.init.LoadConfig;
-import org.ka.menkins.mesos.Schedulers;
+import org.ka.menkins.mesos.MesosSchedulers;
 import org.ka.menkins.storage.Storage;
 
 import java.util.concurrent.Executors;
@@ -42,7 +42,7 @@ public class App {
                 .build();
 
         var aggregator = RequestsAggregator.newAggregatorInitializer(aggregatorPool, storageConfig, storage);
-        Schedulers.newInitializer(config, aggregatedCreateRequests, aggregator, terminateTaskRequests).run();
+        MesosSchedulers.newInitializer(config, aggregatedCreateRequests, aggregator, terminateTaskRequests).run();
     }
 
     private void validate() {

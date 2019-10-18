@@ -1,7 +1,7 @@
 package org.ka.menkins.app;
 
 import lombok.extern.slf4j.Slf4j;
-import org.ka.menkins.mesos.Schedulers;
+import org.ka.menkins.mesos.MesosSchedulers;
 import org.ka.menkins.storage.NodeRequestWithResources;
 import org.ka.menkins.storage.Storage;
 
@@ -14,9 +14,9 @@ import java.util.function.Consumer;
 
 @Slf4j
 public class RequestsAggregator {
-    public static Consumer<AtomicReference<Schedulers.DriverState>> newAggregatorInitializer(ExecutorService pool,
-                                                                                             Storage.StorageConfiguration config,
-                                                                                             Storage.StorageManager storageManager) {
+    public static Consumer<AtomicReference<MesosSchedulers.DriverState>> newAggregatorInitializer(ExecutorService pool,
+                                                                                                  Storage.StorageConfiguration config,
+                                                                                                  Storage.StorageManager storageManager) {
         return stateRef -> {
             var FLUSH_INTERVAL = TimeUnit.SECONDS.toNanos(5);
             var FETCH_TIMEOUT = TimeUnit.SECONDS.toNanos(1);

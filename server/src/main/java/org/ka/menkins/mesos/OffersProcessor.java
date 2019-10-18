@@ -20,7 +20,7 @@ public class OffersProcessor implements Consumer<List<Protos.Offer>> {
 
     AppConfig.Mesos config;
     BlockingQueue<List<NodeRequestWithResources>> queue;
-    AtomicReference<Schedulers.DriverState> stateRef;
+    AtomicReference<MesosSchedulers.DriverState> stateRef;
 
     @Override
     public void accept(List<Protos.Offer> offers) {

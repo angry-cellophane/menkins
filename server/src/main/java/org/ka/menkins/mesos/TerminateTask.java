@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @Slf4j
 public class TerminateTask {
 
-    public static MessageListener<String> newKiller(AtomicReference<Schedulers.DriverState> stateRef) {
+    public static MessageListener<String> newKiller(AtomicReference<MesosSchedulers.DriverState> stateRef) {
         return message -> {
             var taskId = message.getMessageObject();
             log.info("received request to terminate task " + taskId);
