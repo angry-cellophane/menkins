@@ -2,6 +2,9 @@ package org.ka.menkins.app;
 
 import lombok.AllArgsConstructor;
 import org.apache.mesos.MesosNativeLibrary;
+import org.ka.menkins.NanoTimer;
+import org.ka.menkins.aggregator.RequestsAggregator;
+import org.ka.menkins.aggregator.Runner;
 import org.ka.menkins.app.init.AppConfig;
 import org.ka.menkins.app.init.LoadConfig;
 import org.ka.menkins.mesos.MesosSchedulers;
@@ -30,6 +33,10 @@ public class App {
 
         HttpServer.newInitializer(config, createRequests, terminateTaskRequests).run();
 
+        var storageConfig = Storage.StorageConfiguration.builder()
+                .bufferSize(5)
+                .build();
+
         var aggregatorPool = Executors.newSingleThreadExecutor(runnable -> {
             var t = new Thread(runnable);
             t.setDaemon(true);
@@ -37,12 +44,10 @@ public class App {
             return t;
         });
 
-        var storageConfig = Storage.StorageConfiguration.builder()
-                .bufferSize(5)
-                .build();
+        var aggregator = RequestsAggregator.newInstance(storageConfig, createRequests, aggregatedCreateRequests, NanoTimer.systemClock(), Runner.newInfiniteLoop());
+        aggregatorPool.execute(aggregator);
 
-        var aggregator = RequestsAggregator.newAggregatorInitializer(aggregatorPool, storageConfig, storage);
-        MesosSchedulers.newInitializer(config, aggregatedCreateRequests, aggregator, terminateTaskRequests).run();
+        MesosSchedulers.newInitializer(config, aggregatedCreateRequests, terminateTaskRequests).run();
     }
 
     private void validate() {

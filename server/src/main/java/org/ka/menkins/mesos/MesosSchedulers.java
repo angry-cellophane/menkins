@@ -13,7 +13,6 @@ import org.ka.menkins.storage.NodeRequestWithResources;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 
 @Slf4j
 public class MesosSchedulers {
@@ -27,7 +26,6 @@ public class MesosSchedulers {
 
     public static Runnable newInitializer(AppConfig config,
                                           BlockingQueue<List<NodeRequestWithResources>> aggregatedCreateRequestsQueue,
-                                          Consumer<AtomicReference<DriverState>> aggregatorInitializer,
                                           ITopic<String> terminateTasksTopic) {
         return () -> {
             log.info("Initializing driver");
@@ -50,7 +48,6 @@ public class MesosSchedulers {
             stateRef.set(stateRef.get().withDriver(driver));
             startDriver(driver);
 
-            aggregatorInitializer.accept(stateRef);
             terminateTasksTopic.addMessageListener(TerminateTask.newKiller(stateRef));
 
             log.info("driver initialized");

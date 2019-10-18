@@ -17,6 +17,7 @@ trait MesosHelpers {
             'nobody',
             'master:5050',
             'menkins-1',
+            'http://webui',
             600,
             true
     )
