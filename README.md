@@ -1,4 +1,4 @@
-### UNDER CONSTRUCTION
+### project is under development in deep, deep pre-alpha stage
 
 This project contains:
 - jenkins plugin
