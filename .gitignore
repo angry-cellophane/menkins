@@ -29,3 +29,5 @@ build/
 out/
 .idea/
 .gradle/
+
+menkins.properties
