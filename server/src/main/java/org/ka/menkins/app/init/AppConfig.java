@@ -15,6 +15,12 @@ public class AppConfig {
 
     @Value
     @Builder
+    public static class Http {
+        int port;
+    }
+
+    @Value
+    @Builder
     public static class Mesos {
         @NonNull String pathToMesosLib;
         @NonNull String role;
@@ -27,7 +33,7 @@ public class AppConfig {
     }
 
     @NonNull Mesos mesos;
-    int port;
+    @NonNull Http http;
     @NonNull StorageType storageType;
     @NonNull Config hazelcast;
 }

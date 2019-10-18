@@ -8,7 +8,7 @@ public final class LoadConfig {
         return StorageConfiguration.load(properties)
                 .andThen(MesosConfigLoader.load(properties))
                 .andThen(K8sConfigLoader.load(properties))
-                .andThen(AppConfigLoader.load(properties));
+                .andThen(HttpConfigLoader.load(properties));
     }
 
     public static AppConfig fromJvm() {

@@ -4,7 +4,7 @@ import org.ka.menkins.app.init.PropertiesHolder.PropertyNames;
 
 import java.util.function.Function;
 
-final class AppConfigLoader {
+final class HttpConfigLoader {
 
     static final PropertyNames PORT = PropertiesHolder.name("APP_PORT", "app.port");
 
@@ -12,9 +12,11 @@ final class AppConfigLoader {
         return builder -> {
             var port = Integer.valueOf(properties.getValue(PORT, () -> "5678"));
 
-            return builder.port(port);
+            return builder.http(AppConfig.Http.builder()
+                    .port(port)
+                    .build());
         };
     }
 
-    private AppConfigLoader() {}
+    private HttpConfigLoader() {}
 }

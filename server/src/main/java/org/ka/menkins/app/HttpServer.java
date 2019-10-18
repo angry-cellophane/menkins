@@ -20,7 +20,7 @@ public class HttpServer {
     public static Runnable newInitializer(AppConfig config, BlockingQueue<NodeRequestWithResources> queue,
                                           ITopic<String> terminateTaskRequests) {
         return () -> {
-            port(config.getPort());
+            port(config.getHttp().getPort());
             path("/api/v1", () -> {
                 post("/node", "application/json", ((request, response) -> {
                     Metrics.Requests.total.inc();
