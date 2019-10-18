@@ -15,15 +15,24 @@ public class FromFile {
     static final PropertyNames CONFIG_FILE = PropertiesHolder.name("MENKINS_CONFIG_FILE", "menkins.config.file");
 
     static PropertiesHolder preLoadProperties(PropertiesHolder old) {
-        var configFile = old.getValue(CONFIG_FILE, () -> null);
-        if (configFile == null) return old;
+        var props = loadForFile("menkins.properties", old);
 
-        log.info("Loading from configuration file " + configFile);
+        var configFile = old.getValue(CONFIG_FILE, () -> null);
+        if (configFile == null) return props;
 
         var file = new File((configFile));
         if (!file.exists()) {
             throw new RuntimeException("configuration file " + configFile + " doesn't exist. Cannot initialize app");
         }
+
+        return loadForFile(configFile, props);
+    }
+
+    private static PropertiesHolder loadForFile(String configFile, PropertiesHolder old) {
+        log.info("Loading from configuration file " + configFile);
+
+        var file = new File((configFile));
+        if (!file.exists())  return old;
 
         var newProps = new Properties();
         try {

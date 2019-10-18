@@ -6,7 +6,7 @@ import java.util.function.Function;
 
 final class HttpConfigLoader {
 
-    static final PropertyNames PORT = PropertiesHolder.name("APP_PORT", "app.port");
+    static final PropertyNames PORT = PropertiesHolder.name("HTTP_PORT", "http.port");
 
     static Function<AppConfig.AppConfigBuilder, AppConfig.AppConfigBuilder> load(PropertiesHolder properties) {
         return builder -> {

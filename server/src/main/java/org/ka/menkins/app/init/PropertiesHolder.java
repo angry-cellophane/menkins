@@ -3,6 +3,7 @@ package org.ka.menkins.app.init;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
+import spark.utils.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,20 +35,20 @@ class PropertiesHolder {
 
     String getValue(PropertyNames names) {
         var value = env.get(names.getEnvName());
-        if (value != null) return value;
+        if (StringUtils.isNotBlank(value)) return value;
 
         value = properties.getProperty(names.getPropertyName());
-        if (value != null) return value;
+        if (StringUtils.isNotBlank(value)) return value;
 
         throw new PropertyNotFoundException(names);
     }
 
     String getValue(PropertyNames names, Supplier<String> defaultValue) {
         var value = env.get(names.getEnvName());
-        if (value != null) return value;
+        if (StringUtils.isNotBlank(value)) return value;
 
         value = properties.getProperty(names.getPropertyName());
-        if (value != null) return value;
+        if (StringUtils.isNotBlank(value)) return value;
 
         return defaultValue.get();
     }
