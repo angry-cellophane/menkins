@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import java.util.function.Supplier;
@@ -51,5 +52,13 @@ class PropertiesHolder {
         return defaultValue.get();
     }
 
+    PropertiesHolder merge(PropertiesHolder that) {
+        var env = new HashMap<>(this.env);
+        env.putAll(that.env);
 
+        var props = new Properties(this.properties);
+        props.putAll(that.properties);
+
+        return new PropertiesHolder(env, props);
+    }
 }

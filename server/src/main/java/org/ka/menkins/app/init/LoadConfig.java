@@ -5,10 +5,12 @@ import java.util.function.Function;
 public final class LoadConfig {
 
     static Function<AppConfig.AppConfigBuilder, AppConfig.AppConfigBuilder> from(PropertiesHolder properties) {
-        return StorageConfiguration.load(properties)
-                .andThen(MesosConfigLoader.load(properties))
-                .andThen(K8sConfigLoader.load(properties))
-                .andThen(HttpConfigLoader.load(properties));
+        var allProperties = FromFile.preLoadProperties(properties);
+
+        return StorageConfiguration.load(allProperties)
+                .andThen(MesosConfigLoader.load(allProperties))
+                .andThen(K8sConfigLoader.load(allProperties))
+                .andThen(HttpConfigLoader.load(allProperties));
     }
 
     public static AppConfig fromJvm() {
