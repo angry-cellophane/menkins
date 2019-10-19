@@ -13,11 +13,11 @@ class OffersProcessorTest extends Specification implements MesosHelpers {
 
     BlockingQueue<List<NodeRequestWithResources>> queue
     OffersProcessor offersProcessor
-    AtomicReference<MesosSchedulers.DriverState> stateRef
+    AtomicReference<DriverState> stateRef
 
     void setup() {
         queue = new LinkedBlockingQueue<List<NodeRequestWithResources>>()
-        stateRef = new AtomicReference<>(new MesosSchedulers.DriverState(null, false))
+        stateRef = new AtomicReference<>(DriverState.newState())
         offersProcessor = new OffersProcessor(MESOS_CONFIG, queue, stateRef)
     }
 

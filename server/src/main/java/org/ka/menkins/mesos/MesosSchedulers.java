@@ -1,8 +1,6 @@
 package org.ka.menkins.mesos;
 
 import com.hazelcast.core.ITopic;
-import lombok.Value;
-import lombok.With;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.mesos.MesosSchedulerDriver;
 import org.apache.mesos.Protos;
@@ -17,23 +15,16 @@ import java.util.concurrent.atomic.AtomicReference;
 @Slf4j
 public class MesosSchedulers {
 
-    @Value
-    @With
-    public static class DriverState {
-        SchedulerDriver driver;
-        boolean suppressed;
-    }
-
     public static Runnable newInitializer(AppConfig config,
                                           BlockingQueue<List<NodeRequestWithResources>> aggregatedCreateRequestsQueue,
                                           ITopic<String> terminateTasksTopic) {
         return () -> {
             log.info("Initializing driver");
 
-            var stateRef = new AtomicReference<>(new DriverState(null, false));
+            var stateRef = new AtomicReference<>(DriverState.newState());
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                var driver = stateRef.get().driver;
+                var driver = stateRef.get().getDriver();
                 if (driver != null) {
                     log.info("stopping driver");
                     driver.stop(false);
@@ -42,7 +33,7 @@ public class MesosSchedulers {
             }));
 
             var offersProcessor = new OffersProcessor(config.getMesos(), aggregatedCreateRequestsQueue, stateRef);
-            var scheduler = new MenkinsScheduler(offersProcessor);
+            var scheduler = new MenkinsScheduler(stateRef, offersProcessor);
 
             var driver = new MesosSchedulerDriver(scheduler, newFrameworkInfo(config), config.getMesos().getMesosMasterUrl());
             stateRef.set(stateRef.get().withDriver(driver));
