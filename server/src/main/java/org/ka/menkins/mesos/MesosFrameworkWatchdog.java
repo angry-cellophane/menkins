@@ -7,16 +7,32 @@ import org.ka.menkins.storage.NodeRequestWithResources;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 public class MesosFrameworkWatchdog {
-    public static Runnable newInstance(Runner runner,
-                                       NanoTimer timer,
-                                       AtomicReference<DriverState> stateRef,
-                                       BlockingQueue<List<NodeRequestWithResources>> aggregated,
-                                       Runnable stopAppCallback) {
+    public static Runnable initialize(AtomicReference<DriverState> stateRef,
+                                      BlockingQueue<List<NodeRequestWithResources>> aggregated,
+                                      Runnable stopAppCallback) {
+        var pool = Executors.newSingleThreadExecutor(runnable -> {
+            var t = new Thread(runnable);
+            t.setDaemon(true);
+            t.setName("menkins-watchdog-thread");
+            return t;
+        });
+
+        var runner = Runner.newInfiniteLoopWithBreaks(TimeUnit.SECONDS.toNanos(1));
+        var watchdog = newInstance(runner, NanoTimer.systemClock(), stateRef, aggregated, stopAppCallback);
+        return () -> pool.execute(watchdog);
+    }
+
+    static Runnable newInstance(Runner runner,
+                                NanoTimer timer,
+                                AtomicReference<DriverState> stateRef,
+                                BlockingQueue<List<NodeRequestWithResources>> aggregated,
+                                Runnable stopAppCallback) {
         var DISCONNECTED_TIMEOUT = TimeUnit.SECONDS.toNanos(30);
         long[] lastActive = new long[] {timer.nanoTime()};
         return () -> {

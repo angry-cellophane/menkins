@@ -40,7 +40,8 @@ public class RequestsAggregator {
 
     @SuppressWarnings("unchecked")
     public static Runnable newInstance(Storage.StorageConfiguration config,
-                                       AtomicBoolean stopped, BlockingQueue<NodeRequestWithResources> globalQueue,
+                                       AtomicBoolean stopped,
+                                       BlockingQueue<NodeRequestWithResources> globalQueue,
                                        BlockingQueue<List<NodeRequestWithResources>> aggregated,
                                        NanoTimer timer,
                                        Runner runner) {

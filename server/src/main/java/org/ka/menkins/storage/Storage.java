@@ -34,17 +34,22 @@ public class Storage {
         return new StorageManager() {
             @Override
             public BlockingQueue<NodeRequestWithResources> createNodeRequests() {
-                return hz.getQueue("incoming-requests");
+                return hz.getQueue("all-requests");
             }
 
             @Override
             public BlockingQueue<List<NodeRequestWithResources>> aggregatedCreateNodeRequests() {
-                return hz.getQueue("aggregated");
+                return hz.getQueue("aggregated-requests");
             }
 
             @Override
             public Runnable onShutDown() {
-                return () -> hz.getLifecycleService().shutdown();
+                return () -> {
+                    var lifecycle = hz.getLifecycleService();
+                    if (lifecycle.isRunning()) {
+                        lifecycle.shutdown();
+                    }
+                };
             }
 
             @Override

@@ -6,6 +6,7 @@ import org.ka.menkins.aggregator.Aggregators;
 import org.ka.menkins.app.init.AppConfig;
 import org.ka.menkins.app.init.LoadConfig;
 import org.ka.menkins.mesos.DriverState;
+import org.ka.menkins.mesos.MesosFrameworkWatchdog;
 import org.ka.menkins.mesos.MesosSchedulers;
 import org.ka.menkins.storage.Storage;
 
@@ -35,12 +36,14 @@ public class App {
         var finalizeStorage = storage.onShutDown();
         var finalizeAggregator = aggregator.finalizer();
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+        Runnable onStop = () -> {
             finalizeAggregator.run();
             finalizeScheduler.run();
             finalizeHttp.run();
             finalizeStorage.run();
-        }));
+        };
+
+        Runtime.getRuntime().addShutdownHook(new Thread(onStop));
 
         var createRequests = storage.createNodeRequests();
         var aggregatedCreateRequests = storage.aggregatedCreateNodeRequests();
@@ -49,6 +52,7 @@ public class App {
         aggregator.runner().run();
         HttpServer.newInitializer(config, createRequests, terminateTaskRequests).run();
         MesosSchedulers.newInitializer(config, stateRef, aggregatedCreateRequests, terminateTaskRequests).run();
+        MesosFrameworkWatchdog.initialize(stateRef, aggregatedCreateRequests, onStop);
     }
 
     private void validate() {

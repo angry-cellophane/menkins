@@ -37,11 +37,15 @@ public class MesosSchedulers {
 
     public static Runnable newFinalizer(AtomicReference<DriverState> stateRef) {
         return () -> {
-            var driver = stateRef.get().getDriver();
+            var state = stateRef.get();
+            var driver = state.getDriver();
             if (driver != null) {
                 log.info("stopping driver");
                 driver.stop(false);
                 log.info("driver stopped");
+            }
+            if (state.isRunning()) {
+                DriverState.update(stateRef, old -> old.withRunning(false));
             }
         };
     }
