@@ -5,6 +5,7 @@ import org.apache.mesos.Protos
 import org.apache.mesos.Protos.Offer
 import org.apache.mesos.Protos.Resource
 import org.ka.menkins.app.init.AppConfig
+import org.ka.menkins.storage.DockerConfig
 import org.ka.menkins.storage.MesosResources
 import org.ka.menkins.storage.NodeRequest
 import org.ka.menkins.storage.NodeRequestWithResources
@@ -65,7 +66,8 @@ trait MesosHelpers {
                 "http://jenkins/jnlp",
                 "jnlp-args",
                 "http://jenkins/jnlp.jar",
-                "secret"
+                "secret",
+                Collections.emptyMap()
         )
         DockerConfig docker = ResourcesByLabelsLookup.DEFAULT_IMAGE
 

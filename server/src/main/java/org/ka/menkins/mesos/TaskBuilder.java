@@ -2,6 +2,7 @@ package org.ka.menkins.mesos;
 
 import org.apache.mesos.Protos;
 import org.ka.menkins.app.init.AppConfig;
+import org.ka.menkins.storage.DockerConfig;
 import org.ka.menkins.storage.NodeRequest;
 
 import java.util.List;

@@ -1,6 +1,7 @@
 package org.ka.menkins.app
 
 import com.hazelcast.config.Config
+import com.hazelcast.core.ITopic
 import org.ka.menkins.app.init.AppConfig
 import org.ka.menkins.mesos.MesosHelpers
 import org.ka.menkins.storage.NodeRequest
@@ -21,12 +22,12 @@ class HttpServerTest extends Specification implements MesosHelpers {
     void setupSpec() {
         AppConfig config = AppConfig.builder()
                 .mesos(getMESOS_CONFIG())
-                .port(5678)
-                .url("http://localhost:5678")
+                .http(AppConfig.Http.builder().port(5678).build())
                 .hazelcast(new Config())
+                .storageType(AppConfig.StorageType.LOCAL)
                 .build()
 
-        HttpServer.newInitializer(config, queue).run()
+        HttpServer.newInitializer(config, queue, Mock(ITopic)).run()
     }
 
     void cleanupSpec() {
@@ -43,6 +44,7 @@ class HttpServerTest extends Specification implements MesosHelpers {
                 .slaveJarUrl("slave-url")
                 .nodeName("node")
                 .labels("labels")
+                .properties(Collections.emptyMap())
                 .build()
 
         when:

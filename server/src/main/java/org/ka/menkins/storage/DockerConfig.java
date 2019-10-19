@@ -1,4 +1,4 @@
-package org.ka.menkins.mesos;
+package org.ka.menkins.storage;
 
 import lombok.Value;
 import lombok.With;

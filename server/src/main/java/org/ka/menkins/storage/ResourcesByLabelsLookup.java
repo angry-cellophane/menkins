@@ -1,7 +1,6 @@
 package org.ka.menkins.storage;
 
 import org.apache.mesos.Protos;
-import org.ka.menkins.mesos.DockerConfig;
 
 public class ResourcesByLabelsLookup {
 

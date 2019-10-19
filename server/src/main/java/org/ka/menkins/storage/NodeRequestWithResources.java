@@ -3,7 +3,6 @@ package org.ka.menkins.storage;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Value;
-import org.ka.menkins.mesos.DockerConfig;
 
 import java.io.Serializable;
 

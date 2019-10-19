@@ -6,7 +6,6 @@ import org.ka.menkins.storage.MesosResources;
 import org.ka.menkins.storage.NodeRequestWithResources;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -24,19 +23,11 @@ public class OfferRequestMatcher {
     Map<String, MesosResources> resourcesByRole;
 
 
-    public OfferRequestMatcher(Protos.Offer offer, Collection<MesosResources> resources, SlaveConfiguration slaveConfiguration) {
+    public OfferRequestMatcher(Protos.Offer offer, Map<String, MesosResources> resources, SlaveConfiguration slaveConfiguration) {
         this.offer = offer;
         this.slaveConfiguration = slaveConfiguration;
-        this.resourcesByRole = new HashMap<>();
         this.acceptedRequests = new ArrayList<>();
-
-        for (MesosResources resource: resources) {
-            if (resourcesByRole.containsKey(resource.getRole())) {
-                throw new RuntimeException("Offer " + offer.getId().getValue() + " has two resources with role " + resource.getRole());
-            }
-
-            resourcesByRole.put(resource.getRole(), resource);
-        }
+        this.resourcesByRole = new HashMap<>(resources);
     }
 
     public boolean canFit(NodeRequestWithResources request) {
@@ -95,6 +86,6 @@ public class OfferRequestMatcher {
                     return map1;
                 }
         );
-        return new OfferRequestMatcher(offer, byRole.values(), SlaveConfiguration.DEFAULT);
+        return new OfferRequestMatcher(offer, byRole, SlaveConfiguration.DEFAULT);
     }
 }
