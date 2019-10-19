@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Value;
 import lombok.With;
 
+import java.util.Map;
+
 @Value
 @With
 @AllArgsConstructor
@@ -18,6 +20,7 @@ public class NodeRequest {
     String jnlpArgs;
     String slaveJarUrl;
     String jnlpUrl;
+    Map<String, String> properties;
 
     public void validate() {
         if (nodeName == null) {

@@ -13,6 +13,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.ka.menkins.storage.NodeRequest;
 
+import java.util.Collections;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,6 +54,7 @@ public class MenkinsComputerLauncher extends JNLPLauncher {
                 .jnlpSecret("")
                 .jnlpUrl("http://172.28.128.1:8080/computer/" + this.name + "/slave-agent.jnlp")
                 .slaveJarUrl("http://172.28.128.1:8080/jnlpJars/slave.jar")
+                .properties(Collections.emptyMap())
                 .build();
 
         LOGGER.info("Request to menkins " + request);
