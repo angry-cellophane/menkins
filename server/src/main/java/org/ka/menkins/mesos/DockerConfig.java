@@ -5,9 +5,13 @@ import lombok.With;
 import org.apache.mesos.Protos;
 import org.ka.menkins.storage.MesosResources;
 
+import java.io.Serializable;
+
 @Value
 @With
-public class DockerConfig {
+public class DockerConfig implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     MesosResources resources;
     String dockerImage;
     boolean forcePull;

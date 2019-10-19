@@ -5,13 +5,16 @@ import lombok.Builder;
 import lombok.Value;
 import lombok.With;
 
+import java.io.Serializable;
 import java.util.Map;
 
 @Value
 @With
 @AllArgsConstructor
 @Builder
-public class NodeRequest {
+public class NodeRequest implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     String id;
     String nodeName;
     String labels;

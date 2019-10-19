@@ -3,9 +3,13 @@ package org.ka.menkins.storage;
 import lombok.Value;
 import lombok.With;
 
+import java.io.Serializable;
+
 @Value
 @With
-public class MesosResources {
+public class MesosResources implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     public static class MesosResourceOperationException extends RuntimeException {
         public MesosResourceOperationException(String message) {
