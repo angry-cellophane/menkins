@@ -16,21 +16,11 @@ import java.util.concurrent.atomic.AtomicReference;
 public class MesosSchedulers {
 
     public static Runnable newInitializer(AppConfig config,
+                                          AtomicReference<DriverState> stateRef,
                                           BlockingQueue<List<NodeRequestWithResources>> aggregatedCreateRequestsQueue,
                                           ITopic<String> terminateTasksTopic) {
         return () -> {
             log.info("Initializing driver");
-
-            var stateRef = new AtomicReference<>(DriverState.newState());
-
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                var driver = stateRef.get().getDriver();
-                if (driver != null) {
-                    log.info("stopping driver");
-                    driver.stop(false);
-                    log.info("driver stopped");
-                }
-            }));
 
             var offersProcessor = new OffersProcessor(config.getMesos(), aggregatedCreateRequestsQueue, stateRef);
             var scheduler = new MenkinsScheduler(stateRef, offersProcessor);
@@ -42,6 +32,17 @@ public class MesosSchedulers {
             terminateTasksTopic.addMessageListener(TerminateTask.newKiller(stateRef));
 
             log.info("driver initialized");
+        };
+    }
+
+    public static Runnable newFinalizer(AtomicReference<DriverState> stateRef) {
+        return () -> {
+            var driver = stateRef.get().getDriver();
+            if (driver != null) {
+                log.info("stopping driver");
+                driver.stop(false);
+                log.info("driver stopped");
+            }
         };
     }
 

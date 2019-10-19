@@ -5,6 +5,7 @@ import io.prometheus.client.exporter.MetricsServlet;
 import org.ka.menkins.app.init.AppConfig;
 import org.ka.menkins.storage.NodeRequest;
 import org.ka.menkins.storage.NodeRequestWithResources;
+import spark.Spark;
 
 import java.util.concurrent.BlockingQueue;
 
@@ -49,6 +50,10 @@ public class HttpServer {
 
             awaitInitialization();
         };
+    }
+
+    public static Runnable finalizeHttp() {
+        return Spark::awaitStop;
     }
 
     private HttpServer() {}

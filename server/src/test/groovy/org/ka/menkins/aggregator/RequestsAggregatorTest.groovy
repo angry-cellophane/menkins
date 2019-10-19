@@ -10,11 +10,13 @@ import spock.lang.Specification
 import java.util.concurrent.BlockingQueue
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 
 class RequestsAggregatorTest extends Specification implements MesosHelpers, TimerHelper {
 
     BlockingQueue<NodeRequestWithResources> global = new LinkedBlockingQueue<>();
     BlockingQueue<List<NodeRequestWithResources>> aggregated = new LinkedBlockingQueue<>();
+    AtomicBoolean stopped = new AtomicBoolean(false)
 
     void 'send to aggregated when buffer is full'() {
         given:
@@ -26,7 +28,7 @@ class RequestsAggregatorTest extends Specification implements MesosHelpers, Time
         def timer = Mock(NanoTimer) {
             nanoTime() >>> [1, 2, 3]
         }
-        def aggregator = RequestsAggregator.newInstance(config, global, aggregated, timer, Runner.oneTimeRunner())
+        def aggregator = RequestsAggregator.newInstance(config, stopped, global, aggregated, timer, Runner.oneTimeRunner())
         when:
         3.times {
             aggregator.run()
@@ -47,7 +49,7 @@ class RequestsAggregatorTest extends Specification implements MesosHelpers, Time
         def timer = Mock(NanoTimer) {
             nanoTime() >>> [0, 0, seconds(10), seconds(20)]
         }
-        def aggregator = RequestsAggregator.newInstance(config, global, aggregated, timer, Runner.oneTimeRunner())
+        def aggregator = RequestsAggregator.newInstance(config, stopped, global, aggregated, timer, Runner.oneTimeRunner())
         when:
         2.times {
             aggregator.run()
@@ -72,7 +74,7 @@ class RequestsAggregatorTest extends Specification implements MesosHelpers, Time
         def timer = Mock(NanoTimer) {
             nanoTime() >> 0
         }
-        def aggregator = RequestsAggregator.newInstance(config, all, aggregated, timer, Runner.oneTimeRunner())
+        def aggregator = RequestsAggregator.newInstance(config, stopped, all, aggregated, timer, Runner.oneTimeRunner())
         when:
         aggregator.run()
 
@@ -96,11 +98,34 @@ class RequestsAggregatorTest extends Specification implements MesosHelpers, Time
         def timer = Mock(NanoTimer) {
             nanoTime() >>> [0, 0, seconds(60), seconds(120)]
         }
-        def aggregator = RequestsAggregator.newInstance(config, all, aggregatedQueue, timer, Runner.oneTimeRunner())
+        def aggregator = RequestsAggregator.newInstance(config, stopped, all, aggregatedQueue, timer, Runner.oneTimeRunner())
         when:
         2.times { aggregator.run() }
 
         then:
         1 * all.add(_)
+    }
+
+    void 'send to aggregated when stopped'() {
+        given:
+        [request {}, request {}].each { global.add(it) }
+
+        def config = StorageConfiguration.builder()
+                .bufferSize(2)
+                .build()
+        def timer = Mock(NanoTimer) {
+            nanoTime() >> 0
+        }
+        def aggregator = RequestsAggregator.newInstance(config, stopped, global, aggregated, timer, Runner.oneTimeRunner())
+
+        when:
+        stopped.set(true)
+        2.times {
+            aggregator.run()
+        }
+
+        then:
+        aggregated.size() == 1
+        aggregated[0].size() == 1
     }
 }

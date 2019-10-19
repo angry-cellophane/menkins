@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -39,7 +40,7 @@ public class RequestsAggregator {
 
     @SuppressWarnings("unchecked")
     public static Runnable newInstance(Storage.StorageConfiguration config,
-                                       BlockingQueue<NodeRequestWithResources> globalQueue,
+                                       AtomicBoolean stopped, BlockingQueue<NodeRequestWithResources> globalQueue,
                                        BlockingQueue<List<NodeRequestWithResources>> aggregated,
                                        NanoTimer timer,
                                        Runner runner) {
@@ -55,7 +56,7 @@ public class RequestsAggregator {
                 try {
                     int size = buffer[0].size();
                     long timePast = timer.nanoTime() - firstAdded[0];
-                    if (size > 0 && (size >= BUFFER_SIZE || timePast > FLUSH_INTERVAL)) {
+                    if (size > 0 && (size >= BUFFER_SIZE || timePast > FLUSH_INTERVAL || stopped.get())) {
                         boolean added = false;
                         try {
                             added = aggregated.add(buffer[0]);
