@@ -21,12 +21,20 @@ public class MenkinsRetentionStrategy extends RetentionStrategy<MenkinsComputer>
 
     @Override
     public long check(@Nonnull MenkinsComputer c) {
-        MenkinsSlave computerNode = c.getNode();
-        if (c.isIdle() && computerNode != null) {
+        MenkinsSlave node = c.getNode();
+        if (node == null) {
+            return 1;
+        }
+
+        if (node.isPendingDelete()) {
+            node.terminate();
+        }
+
+        if (c.isIdle()) {
             final long idleMilliseconds = System.currentTimeMillis() - c.getIdleStartMilliseconds();
             if (idleMilliseconds > MINUTES.toMillis(idleMinutes)) {
                 LOGGER.log(Level.INFO, "Disconnecting {0}", c.getName());
-                computerNode.terminate();
+                node.terminate();
             }
         }
 

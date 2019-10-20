@@ -45,6 +45,9 @@ public class MenkinsComputerLauncher extends JNLPLauncher {
     public void launch(SlaveComputer computer, TaskListener listener) {
         LOGGER.info("Launching menkins node " + this.name);
 
+        MenkinsComputer menkinsComputer = (MenkinsComputer) computer;
+        MenkinsSlave node = menkinsComputer.getNode();
+
         NodeRequest request = NodeRequest.builder()
                 .id(this.uuid)
                 .jenkinsUrl("http://172.28.128.1:8080/")
@@ -69,6 +72,8 @@ public class MenkinsComputerLauncher extends JNLPLauncher {
             try (CloseableHttpResponse response = HTTP.execute(post)) {
                 if (response.getStatusLine().getStatusCode() != 200) {
                     LOGGER.warning("Launching of " + this.name + " failed. Server returned " + response.getStatusLine().getStatusCode() + " " + IOUtils.toString(response.getEntity().getContent()));
+                    if (node != null) node.setPendingDelete(true);
+                    return;
                 } else {
                     LOGGER.info("Successfully submitted request to spin up " + this.name);
                 }
@@ -86,6 +91,7 @@ public class MenkinsComputerLauncher extends JNLPLauncher {
                 LOGGER.info("menkins node connected " + name);
             } else {
                 LOGGER.warning("menkins node not connected " + name);
+                if (node != null) node.setPendingDelete(true);
             }
         } catch (Exception e) {
             LOGGER.warning("error when trying to launch " + name);

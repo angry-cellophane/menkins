@@ -10,6 +10,7 @@ import jenkins.model.Jenkins;
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,6 +18,8 @@ public class MenkinsSlave extends Slave  {
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = Logger.getLogger(MenkinsSlave.class.getName());
+
+    private final AtomicBoolean pendingDelete;
 
     public MenkinsSlave(String name, String labels) throws Descriptor.FormException, IOException {
         super(name,
@@ -28,6 +31,8 @@ public class MenkinsSlave extends Slave  {
                 new MenkinsComputerLauncher(name, labels),
                 new MenkinsRetentionStrategy(3),
                 Collections.emptyList());
+
+        this.pendingDelete = new AtomicBoolean();
     }
 
     public String getUuid() {
@@ -47,6 +52,14 @@ public class MenkinsSlave extends Slave  {
         } catch (IOException e) {
             LOGGER.log(Level.WARNING, "Failed to terminate Menkins instance: " + getNodeName(), e);
         }
+    }
+
+    public boolean isPendingDelete() {
+        return pendingDelete.get();
+    }
+
+    public void setPendingDelete(boolean value) {
+        pendingDelete.set(value);
     }
 
     @Override
