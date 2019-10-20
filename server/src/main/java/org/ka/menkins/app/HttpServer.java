@@ -2,6 +2,7 @@ package org.ka.menkins.app;
 
 import com.hazelcast.core.ITopic;
 import io.prometheus.client.exporter.MetricsServlet;
+import lombok.extern.slf4j.Slf4j;
 import org.ka.menkins.app.init.AppConfig;
 import org.ka.menkins.storage.NodeRequest;
 import org.ka.menkins.storage.NodeRequestWithResources;
@@ -16,11 +17,13 @@ import static spark.Spark.path;
 import static spark.Spark.port;
 import static spark.Spark.post;
 
+@Slf4j
 public class HttpServer {
 
     public static Runnable newInitializer(AppConfig config, BlockingQueue<NodeRequestWithResources> queue,
                                           ITopic<String> terminateTaskRequests) {
         return () -> {
+            log.info("Starting http server");
             port(config.getHttp().getPort());
             path("/api/v1", () -> {
                 post("/node", "application/json", ((request, response) -> {
@@ -49,11 +52,16 @@ public class HttpServer {
             }));
 
             awaitInitialization();
+            log.info("Http server started");
         };
     }
 
     public static Runnable finalizeHttp() {
-        return Spark::awaitStop;
+        return () -> {
+            log.info("stopping http server");
+            Spark.awaitStop();
+            log.info("http server stopped");
+        };
     }
 
     private HttpServer() {}

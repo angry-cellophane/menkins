@@ -1,6 +1,7 @@
 package org.ka.menkins.app;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.mesos.MesosNativeLibrary;
 import org.ka.menkins.aggregator.Aggregators;
 import org.ka.menkins.app.init.AppConfig;
@@ -12,6 +13,7 @@ import org.ka.menkins.storage.Storage;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+@Slf4j
 @AllArgsConstructor
 public class App {
 
@@ -52,7 +54,13 @@ public class App {
         aggregator.runner().run();
         HttpServer.newInitializer(config, createRequests, terminateTaskRequests).run();
         MesosSchedulers.newInitializer(config, stateRef, aggregatedCreateRequests, terminateTaskRequests).run();
-        MesosFrameworkWatchdog.initialize(stateRef, aggregatedCreateRequests, onStop);
+
+        Runnable watchdogFinalizer = () -> {
+            log.warn("watchdog finalizer called. Stopping the app");
+            onStop.run();
+            System.exit(1);
+        };
+        MesosFrameworkWatchdog.newInitializer(stateRef, aggregatedCreateRequests, watchdogFinalizer).run();
     }
 
     private void validate() {

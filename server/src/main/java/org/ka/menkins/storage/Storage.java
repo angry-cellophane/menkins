@@ -8,12 +8,14 @@ import com.hazelcast.core.MessageListener;
 import com.hazelcast.monitor.LocalTopicStats;
 import lombok.Builder;
 import lombok.Value;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+@Slf4j
 public class Storage {
 
     @Value
@@ -45,10 +47,12 @@ public class Storage {
             @Override
             public Runnable onShutDown() {
                 return () -> {
+                    log.warn("Stopping hazelcast");
                     var lifecycle = hz.getLifecycleService();
                     if (lifecycle.isRunning()) {
                         lifecycle.shutdown();
                     }
+                    log.warn("Hazelcast stopped");
                 };
             }
 
@@ -122,7 +126,7 @@ public class Storage {
 
                     @Override
                     public void destroy() {
-
+                        log.warn("Local storage stopped");
                     }
                 };
             }

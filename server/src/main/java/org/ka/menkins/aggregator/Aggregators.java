@@ -1,11 +1,13 @@
 package org.ka.menkins.aggregator;
 
+import lombok.extern.slf4j.Slf4j;
 import org.ka.menkins.NanoTimer;
 import org.ka.menkins.storage.Storage;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@Slf4j
 public class Aggregators {
 
     public interface Aggregator {
@@ -28,6 +30,7 @@ public class Aggregators {
             @Override
             public Runnable runner() {
                 return () -> {
+                    log.info("Starting aggregators");
                     var aggregatorPool = Executors.newSingleThreadExecutor(runnable -> {
                         var t = new Thread(runnable);
                         t.setDaemon(true);
@@ -35,12 +38,17 @@ public class Aggregators {
                         return t;
                     });
                     aggregatorPool.execute(aggregator);
+                    log.info("Aggregators started");
                 };
             }
 
             @Override
             public Runnable finalizer() {
-                return () -> stopped.set(true);
+                return () -> {
+                    log.info("stopping aggregators");
+                    stopped.set(true);
+                    log.info("aggregators stopped");
+                };
             }
         };
     }

@@ -26,7 +26,7 @@ public class MesosSchedulers {
             var scheduler = new MenkinsScheduler(stateRef, offersProcessor);
 
             var driver = new MesosSchedulerDriver(scheduler, newFrameworkInfo(config), config.getMesos().getMesosMasterUrl());
-            stateRef.set(stateRef.get().withDriver(driver));
+            DriverState.update(stateRef, old -> old.withDriver(driver));
             startDriver(driver);
 
             terminateTasksTopic.addMessageListener(TerminateTask.newKiller(stateRef));

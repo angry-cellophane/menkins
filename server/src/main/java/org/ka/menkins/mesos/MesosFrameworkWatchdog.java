@@ -13,9 +13,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 public class MesosFrameworkWatchdog {
-    public static Runnable initialize(AtomicReference<DriverState> stateRef,
-                                      BlockingQueue<List<NodeRequestWithResources>> aggregated,
-                                      Runnable stopAppCallback) {
+    public static Runnable newInitializer(AtomicReference<DriverState> stateRef,
+                                          BlockingQueue<List<NodeRequestWithResources>> aggregated,
+                                          Runnable stopAppCallback) {
         var pool = Executors.newSingleThreadExecutor(runnable -> {
             var t = new Thread(runnable);
             t.setDaemon(true);
@@ -35,6 +35,7 @@ public class MesosFrameworkWatchdog {
                                 Runnable stopAppCallback) {
         var DISCONNECTED_TIMEOUT = TimeUnit.SECONDS.toNanos(30);
         long[] lastActive = new long[] {timer.nanoTime()};
+        boolean[] stopped = new boolean[] {false};
         return () -> {
             runner.run(() -> {
                 try {
@@ -53,8 +54,9 @@ public class MesosFrameworkWatchdog {
                             }
                         }
                     } else {
-                        if (now - lastActive[0] > DISCONNECTED_TIMEOUT) {
+                        if (!stopped[0] && now - lastActive[0] > DISCONNECTED_TIMEOUT) {
                             stopAppCallback.run();
+                            stopped[0] = true;
                         }
                     }
                 } catch (Exception e) {
