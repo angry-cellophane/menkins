@@ -45,7 +45,6 @@ public class MenkinsCloud extends Cloud {
             String labels = label.getExpression().replaceAll("&", "");
             String nodeName = buildNodeName(labels);
             MenkinsSlave slave = new MenkinsSlave(nodeName, labels);
-            LOGGER.info("toComputer = " + slave.toComputer());
             nodes.add(new PlannedNode(this.getDisplayName(), Computer.threadPoolForRemoting
                     .submit(() -> {
                         // We do not need to explicitly add the Node here because that is handled by
