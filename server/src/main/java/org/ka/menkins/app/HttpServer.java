@@ -13,6 +13,7 @@ import java.util.concurrent.BlockingQueue;
 import static spark.Spark.awaitInitialization;
 import static spark.Spark.delete;
 import static spark.Spark.get;
+import static spark.Spark.halt;
 import static spark.Spark.path;
 import static spark.Spark.port;
 import static spark.Spark.post;
@@ -31,7 +32,10 @@ public class HttpServer {
 
                     var node = Json.from(request.bodyAsBytes(), NodeRequest.class);
                     node.validate();
-                    queue.add(NodeRequestWithResources.from(node));
+                    var added = queue.add(NodeRequestWithResources.from(node));
+                    if (!added) {
+                        halt(500, "request " + node.getId() + " cannot be added to global queue");
+                    }
 
                     return "";
                 }));
