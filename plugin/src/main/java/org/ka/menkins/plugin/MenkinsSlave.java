@@ -61,5 +61,10 @@ public class MenkinsSlave extends Slave  {
         public String getDisplayName() {
             return "Menkins slave";
         }
+
+        @Override
+        public boolean isInstantiable() {
+            return false;
+        }
     }
 }

@@ -40,21 +40,25 @@ public class MenkinsCloud extends Cloud {
 
     @Override
     public Collection<PlannedNode> provision(Label label, int excessWorkload) {
+        LOGGER.info(String.format("Received request to provision %d executors for label %s", excessWorkload, label));
         List<PlannedNode> nodes = new ArrayList<>();
         try {
-            String labels = label.getExpression().replaceAll("&", "");
-            String nodeName = buildNodeName(labels);
-            MenkinsSlave slave = new MenkinsSlave(nodeName, labels);
-            nodes.add(new PlannedNode(this.getDisplayName(), Computer.threadPoolForRemoting
-                    .submit(() -> {
-                        // We do not need to explicitly add the Node here because that is handled by
-                        // hudson.slaves.NodeProvisioner::update() that checks the result from the
-                        // Future and adds the node. Though there is duplicate node addition check
-                        // because of this early addition there is difference in job scheduling and
-                        // best to avoid it.
-                        LOGGER.info(String.format("Slave %s pulled by thread.", slave.getUuid()));
-                        return slave;
-                    }), 1));
+            while (excessWorkload > 0) {
+                excessWorkload--;
+                String labels = label.getExpression().replaceAll("&", "");
+                String nodeName = buildNodeName(labels);
+                MenkinsSlave slave = new MenkinsSlave(nodeName, labels);
+                nodes.add(new PlannedNode(this.getDisplayName(), Computer.threadPoolForRemoting
+                        .submit(() -> {
+                            // We do not need to explicitly add the Node here because that is handled by
+                            // hudson.slaves.NodeProvisioner::update() that checks the result from the
+                            // Future and adds the node. Though there is duplicate node addition check
+                            // because of this early addition there is difference in job scheduling and
+                            // best to avoid it.
+                            LOGGER.info(String.format("Slave %s pulled by thread.", slave.getUuid()));
+                            return slave;
+                        }), 1));
+            }
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Failed to create instances on Mesos", e);
         }
