@@ -14,6 +14,8 @@ final class MesosConfigLoader {
     static final PropertyNames MASTER_URL = PropertiesHolder.name("MESOS_MASTER", "mesos.master");
     static final PropertyNames CHECKPOINT_ON = PropertiesHolder.name("MESOS_CHECKPOINT_ON", "mesos.checkpoint.on");
     static final PropertyNames WEBUI_URL = PropertiesHolder.name("MESOS_WEBUI_URL", "mesos.webui.url");
+    static final PropertyNames PRINCIPLE = PropertiesHolder.name("MESOS_PRINCIPLE", "mesos.principle");
+    static final PropertyNames SECRET = PropertiesHolder.name("MESOS_SECRET", "mesos.secret");
 
 
     static Function<AppConfig.AppConfigBuilder, AppConfig.AppConfigBuilder> load(PropertiesHolder properties) {
@@ -27,6 +29,8 @@ final class MesosConfigLoader {
             var mesosMaster = properties.getValue(MASTER_URL);
             var checkpoint = Boolean.getBoolean(properties.getValue(CHECKPOINT_ON, () -> "true"));
             var webui = properties.getValue(WEBUI_URL, () -> id);
+            var principle = properties.getValue(PRINCIPLE, () -> "jenkins");
+            var secret = properties.getValue(SECRET, () -> "");
 
             return builder.mesos(mesos
                     .pathToMesosLib(path)
@@ -36,6 +40,8 @@ final class MesosConfigLoader {
                     .mesosMasterUrl(mesosMaster)
                     .checkpoint(checkpoint)
                     .webUiUrl(webui)
+                    .principal(principle)
+                    .secret(secret)
                     .build());
         };
     }

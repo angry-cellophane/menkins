@@ -7,8 +7,10 @@ import org.apache.mesos.Protos;
 import org.apache.mesos.SchedulerDriver;
 import org.ka.menkins.app.init.AppConfig;
 import org.ka.menkins.storage.NodeRequestWithResources;
+import spark.utils.StringUtils;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -25,7 +27,16 @@ public class MesosSchedulers {
             var offersProcessor = new OffersProcessor(config.getMesos(), aggregatedCreateRequestsQueue, stateRef);
             var scheduler = new MenkinsScheduler(stateRef, offersProcessor);
 
-            var driver = new MesosSchedulerDriver(scheduler, newFrameworkInfo(config), config.getMesos().getMesosMasterUrl());
+            var frameworkInfo = newFrameworkInfo(config);
+            var mesosUrl = config.getMesos().getMesosMasterUrl();
+
+            var principle = config.getMesos().getPrincipal();
+            var driver = Optional.ofNullable(config.getMesos().getSecret())
+                    .filter(StringUtils::isNotBlank)
+                    .map(s -> Protos.Credential.newBuilder().setPrincipal(principle).setSecret(s).build())
+                    .map(secret -> new MesosSchedulerDriver(scheduler, frameworkInfo, mesosUrl, secret))
+                    .orElseGet(() -> new MesosSchedulerDriver(scheduler, frameworkInfo, mesosUrl));
+
             DriverState.update(stateRef, old -> old.withDriver(driver));
             startDriver(driver);
 
@@ -57,6 +68,7 @@ public class MesosSchedulers {
                 .setName(mesos.getFrameworkName())
                 .setRole(mesos.getRole())
                 .setCheckpoint(mesos.isCheckpoint())
+                .setPrincipal(mesos.getPrincipal())
                 .setWebuiUrl(mesos.getWebUiUrl())
                 .build();
     }

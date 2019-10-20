@@ -15,6 +15,8 @@ class MesosConfigLoaderTest extends Specification {
                 (MesosConfigLoader.FRAMEWORK_ID.envName) : '1234',
                 (MesosConfigLoader.CHECKPOINT_ON.envName): 'false',
                 (MesosConfigLoader.WEBUI_URL.envName)    : 'http://webui',
+                (MesosConfigLoader.PRINCIPLE.envName)    : 'principle',
+                (MesosConfigLoader.SECRET.envName)       : 'secret',
         ]
         def holder = new PropertiesHolder(env, props)
 
@@ -31,6 +33,8 @@ class MesosConfigLoaderTest extends Specification {
             frameworkName == 'jenkins-1234'
             checkpoint == false
             webUiUrl == 'http://webui'
+            principal == 'principle'
+            secret == 'secret'
         }
     }
 
@@ -44,6 +48,8 @@ class MesosConfigLoaderTest extends Specification {
         props.put(MesosConfigLoader.FRAMEWORK_ID.propertyName, '1234')
         props.put(MesosConfigLoader.CHECKPOINT_ON.propertyName, 'false')
         props.put(MesosConfigLoader.WEBUI_URL.propertyName, 'http://webui')
+        props.put(MesosConfigLoader.PRINCIPLE.propertyName, 'principle')
+        props.put(MesosConfigLoader.SECRET.propertyName, 'secret')
         def env = [:]
 
         def holder = new PropertiesHolder(env, props)
@@ -61,6 +67,8 @@ class MesosConfigLoaderTest extends Specification {
             frameworkName == 'jenkins-1234'
             checkpoint == false
             webUiUrl == 'http://webui'
+            principal == 'principle'
+            secret == 'secret'
         }
     }
 
@@ -84,6 +92,8 @@ class MesosConfigLoaderTest extends Specification {
             frameworkName =~ /menkins-.+/
             webUiUrl =~ /menkins-.+/
             checkpoint == true
+            principal == 'jenkins'
+            secret == ''
         }
     }
 

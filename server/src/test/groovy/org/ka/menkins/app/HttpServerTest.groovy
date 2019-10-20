@@ -1,5 +1,6 @@
 package org.ka.menkins.app
 
+import com.hazelcast.client.config.ClientConfig
 import com.hazelcast.config.Config
 import com.hazelcast.core.ITopic
 import org.ka.menkins.app.init.AppConfig
@@ -22,7 +23,7 @@ class HttpServerTest extends Specification implements MesosHelpers {
         AppConfig config = AppConfig.builder()
                 .mesos(getMESOS_CONFIG())
                 .http(AppConfig.Http.builder().port(5678).build())
-                .hazelcast(new Config())
+                .hazelcast(new ClientConfig())
                 .storageType(AppConfig.StorageType.LOCAL)
                 .build()
 

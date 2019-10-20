@@ -19,6 +19,8 @@ trait MesosHelpers {
             'master:5050',
             'menkins-1',
             'http://webui',
+            'principle',
+            'secret',
             600,
             true
     )

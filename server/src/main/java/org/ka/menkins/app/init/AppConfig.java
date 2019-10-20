@@ -28,6 +28,8 @@ public class AppConfig {
         @NonNull String mesosMasterUrl;
         @NonNull String frameworkName;
         @NonNull String webUiUrl;
+        @NonNull String principal;
+        @NonNull String secret;
         double refuseInSeconds;
         boolean checkpoint;
     }
