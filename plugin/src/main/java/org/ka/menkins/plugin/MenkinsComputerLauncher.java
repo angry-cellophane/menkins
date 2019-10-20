@@ -24,20 +24,21 @@ public class MenkinsComputerLauncher extends JNLPLauncher {
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    private static final String URL = "http://localhost:5678/api/v1/node";
     private static final CloseableHttpClient HTTP = HttpClientBuilder.create().build();
 
     private final String uuid;
     private final String name;
     private final String labels;
     private final String menkinsUrl;
+    private final String jenkinsUrl;
     private final long nodeTimeoutInNs;
 
-    public MenkinsComputerLauncher(String name, String labels, String menkinsUrl, long nodeTimeoutInNs) {
+    public MenkinsComputerLauncher(String name, String labels, String menkinsUrl, String jenkinsUrl, long nodeTimeoutInNs) {
         this.uuid = UUID.randomUUID().toString();
         this.name = name;
         this.labels = labels;
         this.menkinsUrl = menkinsUrl;
+        this.jenkinsUrl = jenkinsUrl;
         this.nodeTimeoutInNs = nodeTimeoutInNs;
     }
 
@@ -54,13 +55,13 @@ public class MenkinsComputerLauncher extends JNLPLauncher {
 
         NodeRequest request = NodeRequest.builder()
                 .id(this.uuid)
-                .jenkinsUrl("http://172.28.128.1:8080/")
+                .jenkinsUrl(jenkinsUrl)
                 .labels(this.labels)
                 .nodeName(this.name)
                 .jnlpArgs("-noReconnect")
                 .jnlpSecret("")
-                .jnlpUrl("http://172.28.128.1:8080/computer/" + this.name + "/slave-agent.jnlp")
-                .slaveJarUrl("http://172.28.128.1:8080/jnlpJars/slave.jar")
+                .jnlpUrl(jenkinsUrl + "/computer/" + this.name + "/slave-agent.jnlp")
+                .slaveJarUrl(jenkinsUrl + "/jnlpJars/slave.jar")
                 .properties(Collections.emptyMap())
                 .build();
 
@@ -118,11 +119,15 @@ public class MenkinsComputerLauncher extends JNLPLauncher {
         }
     }
 
+    private String apiUrl() {
+        return this.menkinsUrl + "/api/v1";
+    }
+
     private String createNodeUrl() {
-        return this.menkinsUrl;
+        return apiUrl() + "/node";
     }
 
     private String terminateNodeUrl() {
-        return this.menkinsUrl + "/" + this.uuid;
+        return apiUrl() + "/node/" + this.uuid;
     }
 }
