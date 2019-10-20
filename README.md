@@ -1,4 +1,5 @@
-### project is under development in deep, deep pre-alpha stage
+## project is under development in deep, deep pre-alpha stage
+#### Build status: [![CircleCI](https://circleci.com/gh/angry-cellophane/menkins/tree/master.svg?style=svg)](https://circleci.com/gh/angry-cellophane/menkins/tree/master)
 
 This project contains:
 - jenkins plugin
