@@ -3,5 +3,6 @@ rootProject.name = 'menkins-parent'
 include 'server'
 include 'client'
 include 'plugin'
+include 'hazelcast-node'
 
 rootProject.children.each { it.name = "menkins-${it.name}"}

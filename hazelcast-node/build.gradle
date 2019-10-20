@@ -1,0 +1,31 @@
+apply plugin: 'application'
+
+mainClassName = 'org.ka.menkins.app.hz.node.App'
+
+sourceCompatibility = 11
+targetCompatibility = 11
+
+dependencies {
+    compile project(':menkins-client')
+
+    compile libraries.hz
+    compileOnly libraries.lombok
+    annotationProcessor libraries.lombok
+
+    compile libraries.log4j2
+
+    testCompile libraries.groovy
+    testCompile libraries.spock
+}
+
+jar {
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA', 'META-INF/*.MF'
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+}
+
