@@ -1,7 +1,7 @@
 package org.ka.menkins.storage;
 
-import com.hazelcast.config.Config;
-import com.hazelcast.core.Hazelcast;
+import com.hazelcast.client.HazelcastClient;
+import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.core.ITopic;
 import com.hazelcast.core.Message;
 import com.hazelcast.core.MessageListener;
@@ -31,10 +31,10 @@ public class Storage {
         Runnable onShutDown();
     }
 
-    public static StorageManager newRemoteStorage(Config config) {
-        log.info("Starting hazelcast node");
-        var hz = Hazelcast.newHazelcastInstance(config);
-        log.info("Hazelcast node started");
+    public static StorageManager newRemoteStorage(ClientConfig config) {
+        log.info("Starting hazelcast client");
+        var hz = HazelcastClient.newHazelcastClient(config);
+        log.info("Hazelcast client started");
         return new StorageManager() {
             @Override
             public BlockingQueue<NodeRequestWithResources> createNodeRequests() {

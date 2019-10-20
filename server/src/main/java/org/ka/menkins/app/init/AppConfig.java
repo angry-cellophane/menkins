@@ -1,6 +1,6 @@
 package org.ka.menkins.app.init;
 
-import com.hazelcast.config.Config;
+import com.hazelcast.client.config.ClientConfig;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
@@ -35,5 +35,5 @@ public class AppConfig {
     @NonNull Mesos mesos;
     @NonNull Http http;
     @NonNull StorageType storageType;
-    @NonNull Config hazelcast;
+    @NonNull ClientConfig hazelcast;
 }
