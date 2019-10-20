@@ -69,7 +69,7 @@ class MenkinsScheduler implements Scheduler {
 
     @Override
     public void statusUpdate(SchedulerDriver driver, Protos.TaskStatus status) {
-        log.info("Framework " + getFrameworkId() + " -> status update " + status);
+        log.info("Framework " + getFrameworkId() + " -> status update " + status.getTaskId().getValue() + " " + status.getMessage());
     }
 
     @Override

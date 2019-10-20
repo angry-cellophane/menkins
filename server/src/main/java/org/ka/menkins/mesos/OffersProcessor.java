@@ -65,6 +65,7 @@ public class OffersProcessor implements Consumer<List<Protos.Offer>> {
 
         // decline unused offers
         matchers.stream().filter(matcher -> matcher.getAcceptedRequests().isEmpty())
+                .filter(matcher -> matcher.getOffer() != NO_MATCH)
                 .map(matcher -> matcher.getOffer().getId())
                 .forEach(declineOffer);
 
