@@ -74,14 +74,12 @@ public class OffersProcessor implements Consumer<List<Protos.Offer>> {
         var taskBuilder = TaskBuilder.newTaskBuilder(config);
         matched.forEach(matcher -> {
             if (matcher.getOffer() == NO_MATCH) {
-                log.info("no match found for " + matcher.getAcceptedRequests().size());
-                log.info("no match found for " + matcher.getAcceptedRequests().stream().map(r -> r.getRequest().getId()).collect(Collectors.joining()));
+                log.info("no match found for requests " + matcher.getAcceptedRequests().stream().map(r -> r.getRequest().getId()).collect(Collectors.joining(", ")));
                 queue.add(matcher.getAcceptedRequests());
             } else {
                 var tasks = taskBuilder.apply(matcher);
                 if (!tasks.isEmpty()) {
-                    log.info("offer " + matcher.getOffer().getId().getValue() + " used to start " + tasks.size() + " tasks");
-                    log.info("offer " + matcher.getOffer().getId().getValue() + " used to start tasks " + tasks);
+                    log.info("offer " + matcher.getOffer().getId().getValue() + " used to start tasks " + tasks.stream().map(t -> t.getTaskId().getValue()).collect(Collectors.joining(", ")));
                     driver.launchTasks(Collections.singletonList(matcher.getOffer().getId()), tasks);
                 }
             }
