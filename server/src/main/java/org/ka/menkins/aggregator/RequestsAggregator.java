@@ -64,6 +64,7 @@ public class RequestsAggregator {
                         } catch (Exception e) {}
 
                         if (added) {
+                            log.info("aggregator added " + buffer[0].size() + " requests to aggregated queue");
                             buffer[0] = new ArrayList<>(BUFFER_SIZE);
                         } else {
                             Metrics.failedPush.inc();

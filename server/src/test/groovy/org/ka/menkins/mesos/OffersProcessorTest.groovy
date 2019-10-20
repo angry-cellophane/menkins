@@ -152,4 +152,34 @@ class OffersProcessorTest extends Specification implements MesosHelpers {
         1 * driver.launchTasks([Protos.OfferID.newBuilder().setValue('1').build()], { it.size() == 2 })
         1 * driver.launchTasks([Protos.OfferID.newBuilder().setValue('2').build()], { it.size() == 1 })
     }
+
+    void 'return not matched offers to global queue'() {
+        given:
+        def driver = Mock(SchedulerDriver)
+        stateRef.set(stateRef.get().withDriver(driver))
+
+        def requests = (1 .. 3).collect {
+            request {
+                docker {
+                    withResources(mesosResource(1.0, 50, 'jenkins'))
+                }
+            }
+        }
+        def offers = [
+                offer {
+                    id = '1'
+                    cpus = 2.0
+                    mem = 100
+                    role = '*'
+                }
+        ]
+
+        when:
+        queue.add(requests)
+        offersProcessor.accept(offers)
+
+        then:
+        queue.size() == 1
+        queue[0].size() == 1
+    }
 }

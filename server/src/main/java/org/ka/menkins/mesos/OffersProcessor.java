@@ -18,6 +18,25 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class OffersProcessor implements Consumer<List<Protos.Offer>> {
 
+    static final Protos.Offer NO_MATCH = Protos.Offer.newBuilder()
+            .setId(Protos.OfferID.newBuilder().setValue("NO_MATCH").build())
+            .setFrameworkId(Protos.FrameworkID.newBuilder().setValue("fake_no_match").build())
+            .setSlaveId(Protos.SlaveID.newBuilder().setValue("fake_slave_id").build())
+            .setHostname("fake_host")
+            .addResources(Protos.Resource.newBuilder()
+                    .setName("cpus")
+                    .setRole("*")
+                    .setType(Protos.Value.Type.SCALAR)
+                    .setScalar(Protos.Value.Scalar.newBuilder().setValue(10000000000.0d).build())
+                    .build())
+            .addResources(Protos.Resource.newBuilder()
+                    .setName("mem")
+                    .setRole("*")
+                    .setType(Protos.Value.Type.SCALAR)
+                    .setScalar(Protos.Value.Scalar.newBuilder().setValue(10000000000.0d).build())
+                    .build())
+            .build();
+
     AppConfig.Mesos config;
     BlockingQueue<List<NodeRequestWithResources>> queue;
     AtomicReference<DriverState> stateRef;
@@ -41,10 +60,8 @@ public class OffersProcessor implements Consumer<List<Protos.Offer>> {
             log.info("framework suppressed as there were no builder node requests");
             return;
         }
-        var matchers = offers.stream().map(OfferRequestMatcher::from)
-                .collect(Collectors.toList());
 
-        matchByOffer(requests, matchers);
+        var matchers = matchByOffer(requests, offers);
 
         // decline unused offers
         matchers.stream().filter(matcher -> matcher.getAcceptedRequests().isEmpty())
@@ -55,23 +72,36 @@ public class OffersProcessor implements Consumer<List<Protos.Offer>> {
 
         var taskBuilder = TaskBuilder.newTaskBuilder(config);
         matched.forEach(matcher -> {
-            var tasks = taskBuilder.apply(matcher);
-            if (!tasks.isEmpty()) {
-                log.info("offer " + matcher.getOffer().getId().getValue() + " used to start tasks " + tasks);
-                driver.launchTasks(Collections.singletonList(matcher.getOffer().getId()), tasks);
+            if (matcher.getOffer() == NO_MATCH) {
+                log.info("no match found for " + matcher.getAcceptedRequests().size());
+                log.info("no match found for " + matcher.getAcceptedRequests().stream().map(r -> r.getRequest().getId()).collect(Collectors.joining()));
+                queue.add(matcher.getAcceptedRequests());
+            } else {
+                var tasks = taskBuilder.apply(matcher);
+                if (!tasks.isEmpty()) {
+                    log.info("offer " + matcher.getOffer().getId().getValue() + " used to start " + tasks.size() + " tasks");
+                    log.info("offer " + matcher.getOffer().getId().getValue() + " used to start tasks " + tasks);
+                    driver.launchTasks(Collections.singletonList(matcher.getOffer().getId()), tasks);
+                }
             }
         });
     }
 
-    private void matchByOffer(List<NodeRequestWithResources> requests, List<OfferRequestMatcher> offers) {
-        for (NodeRequestWithResources request : requests) {
-            for (OfferRequestMatcher offer : offers) {
-                if (!offer.canFit(request)) continue;
+    private List<OfferRequestMatcher> matchByOffer(List<NodeRequestWithResources> requests, List<Protos.Offer> offers) {
+        var matchers = offers.stream().map(OfferRequestMatcher::from)
+                .collect(Collectors.toList());
+        matchers.add(OfferRequestMatcher.from(NO_MATCH));
 
-                offer.accept(request);
+        for (NodeRequestWithResources request : requests) {
+            for (OfferRequestMatcher matcher : matchers) {
+                if (!matcher.canFit(request)) continue;
+
+                matcher.accept(request);
                 break; // found a suitable offer, move to the next request
             }
         }
+
+        return matchers;
     }
 
     private Consumer<Protos.OfferID> declineOfferClosure(SchedulerDriver driver) {
