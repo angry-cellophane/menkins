@@ -29,7 +29,9 @@ public class App {
         Metrics.Requests.total.get();
 
         var stateRef = new AtomicReference<>(DriverState.newState());
-        var storage = Storage.newLocalStorageManager();
+        var storage = config.getStorageType() == AppConfig.StorageType.LOCAL
+                ? Storage.newLocalStorageManager()
+                : Storage.newRemoteStorage(config.getHazelcast());
 
         var aggregator = Aggregators.newAggregator(storage);
 

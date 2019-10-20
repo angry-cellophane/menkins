@@ -31,8 +31,10 @@ public class Storage {
         Runnable onShutDown();
     }
 
-    public static StorageManager newStorageManager(Config config) {
+    public static StorageManager newRemoteStorage(Config config) {
+        log.info("Starting hazelcast node");
         var hz = Hazelcast.newHazelcastInstance(config);
+        log.info("Hazelcast node started");
         return new StorageManager() {
             @Override
             public BlockingQueue<NodeRequestWithResources> createNodeRequests() {
