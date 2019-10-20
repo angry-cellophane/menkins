@@ -2,7 +2,7 @@ version: 2
 jobs:
   build-jpi:
     docker:
-      - image: circleci/openjdk:8u222-jdk-stretch
+      - image: circleci/openjdk:8-jdk
     working_directory: ~/repo
     environment:
       _JAVA_OPTIONS: "-Xmx3g"
