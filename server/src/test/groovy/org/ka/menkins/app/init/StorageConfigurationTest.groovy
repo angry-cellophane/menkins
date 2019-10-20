@@ -22,7 +22,7 @@ class StorageConfigurationTest extends Specification {
     void 'load all properties from system properties'() {
         given:
         def props = new Properties()
-        props.put(StorageConfiguration.TYPE.propertyName, 'hazelcast')
+        props.put(StorageConfiguration.TYPE.propertyName, 'remote')
         def env = [:]
         def holder = new PropertiesHolder(env, props)
 
@@ -30,7 +30,7 @@ class StorageConfigurationTest extends Specification {
         def builder = StorageConfiguration.load(holder).apply(AppConfig.builder())
 
         then:
-        builder.storageType == AppConfig.StorageType.HAZELCAST
+        builder.storageType == AppConfig.StorageType.REMOTE
     }
 
     void 'check default values are set'() {

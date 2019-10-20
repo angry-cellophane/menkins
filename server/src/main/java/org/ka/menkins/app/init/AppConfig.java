@@ -10,7 +10,7 @@ import lombok.Value;
 public class AppConfig {
 
     public static enum StorageType {
-        LOCAL, HAZELCAST
+        LOCAL, REMOTE
     }
 
     @Value
