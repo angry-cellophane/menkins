@@ -2,7 +2,8 @@
 
 This project contains:
 - jenkins plugin
-- standalone app
+- standalone http server/mesos framework
+- hazelcast data nodes
 
 The goal is to provide a broker between jenkins and cloud providers.
 The original issue came from the mesos world where mesos constantly polls jenkins masters (sends offers) which may cause performance issues.
