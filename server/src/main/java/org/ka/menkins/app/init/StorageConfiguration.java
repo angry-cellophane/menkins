@@ -11,6 +11,7 @@ final class StorageConfiguration {
 
     static final PropertyNames TYPE = PropertiesHolder.name("STORAGE_TYPE", "storage.type");
     static final PropertyNames HZ_NODES = PropertiesHolder.name("HAZELCAST_NODES", "hazelcast.nodes");
+    static final PropertyNames HZ_CLUSTER_NAME = PropertiesHolder.name("HAZELCAST_CLUSTER_NAME", "hazelcast.cluster.name");
 
     static Function<AppConfig.AppConfigBuilder, AppConfig.AppConfigBuilder> load(PropertiesHolder properties) {
         return builder -> {
@@ -23,6 +24,9 @@ final class StorageConfiguration {
                         .map(String::trim)
                         .collect(Collectors.toList());
                 network.setAddresses(nodes);
+
+                var clusterName = properties.getValue(HZ_CLUSTER_NAME);
+                hazelcast.getGroupConfig().setName(clusterName);
             }
 
             builder.storageType(type);

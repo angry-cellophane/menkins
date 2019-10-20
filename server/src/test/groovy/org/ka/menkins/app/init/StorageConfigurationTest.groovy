@@ -25,6 +25,7 @@ class StorageConfigurationTest extends Specification {
         def props = new Properties()
         props.put(StorageConfiguration.TYPE.propertyName, 'remote')
         props.put(StorageConfiguration.HZ_NODES.propertyName, 'localhost:5701')
+        props.put(StorageConfiguration.HZ_CLUSTER_NAME.propertyName, 'menkins')
         def env = [:]
         def holder = new PropertiesHolder(env, props)
 
@@ -53,6 +54,22 @@ class StorageConfigurationTest extends Specification {
         given:
         def props = new Properties()
         props.put(StorageConfiguration.TYPE.propertyName, 'remote')
+        props.put(StorageConfiguration.HZ_CLUSTER_NAME.propertyName, 'menkins')
+        def env = [:]
+        def holder = new PropertiesHolder(env, props)
+
+        when:
+        StorageConfiguration.load(holder).apply(AppConfig.builder())
+
+        then:
+        thrown(PropertiesHolder.PropertyNotFoundException)
+    }
+
+    void 'error when hazelcast cluster name not set'() {
+        given:
+        def props = new Properties()
+        props.put(StorageConfiguration.TYPE.propertyName, 'remote')
+        props.put(StorageConfiguration.HZ_NODES.propertyName, 'localhost:5701, localhost:5702')
         def env = [:]
         def holder = new PropertiesHolder(env, props)
 
@@ -68,6 +85,7 @@ class StorageConfigurationTest extends Specification {
         def props = new Properties()
         props.put(StorageConfiguration.TYPE.propertyName, 'remote')
         props.put(StorageConfiguration.HZ_NODES.propertyName, 'localhost:5701, localhost:5702')
+        props.put(StorageConfiguration.HZ_CLUSTER_NAME.propertyName, 'menkins')
         def env = [:]
         def holder = new PropertiesHolder(env, props)
 
@@ -75,6 +93,22 @@ class StorageConfigurationTest extends Specification {
         def builder = StorageConfiguration.load(holder).apply(AppConfig.builder())
 
         then:
-        builder.hazelcast.getNetworkConfig().getAddresses() == ['localhost:5701', 'localhost:5702']
+        builder.hazelcast.networkConfig.addresses == ['localhost:5701', 'localhost:5702']
+    }
+
+    void 'hazelcast cluster name is set'() {
+        given:
+        def props = new Properties()
+        props.put(StorageConfiguration.TYPE.propertyName, 'remote')
+        props.put(StorageConfiguration.HZ_NODES.propertyName, 'localhost:5701, localhost:5702')
+        props.put(StorageConfiguration.HZ_CLUSTER_NAME.propertyName, 'menkins')
+        def env = [:]
+        def holder = new PropertiesHolder(env, props)
+
+        when:
+        def builder = StorageConfiguration.load(holder).apply(AppConfig.builder())
+
+        then:
+        builder.hazelcast.groupConfig.name == 'menkins'
     }
 }
