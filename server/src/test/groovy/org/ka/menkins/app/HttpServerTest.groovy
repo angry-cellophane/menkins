@@ -6,7 +6,6 @@ import org.ka.menkins.app.init.AppConfig
 import org.ka.menkins.mesos.MesosHelpers
 import org.ka.menkins.storage.NodeRequest
 import org.ka.menkins.storage.NodeRequestWithResources
-import spark.Spark
 import spock.lang.Specification
 
 import java.net.http.HttpClient
