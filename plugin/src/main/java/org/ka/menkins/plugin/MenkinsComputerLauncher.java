@@ -30,11 +30,13 @@ public class MenkinsComputerLauncher extends JNLPLauncher {
     private final String uuid;
     private final String name;
     private final String labels;
+    private final long nodeTimeoutInNs;
 
-    public MenkinsComputerLauncher(String name, String labels) {
+    public MenkinsComputerLauncher(String name, String labels, long nodeTimeoutInNs) {
         this.uuid = UUID.randomUUID().toString();
         this.name = name;
         this.labels = labels;
+        this.nodeTimeoutInNs = nodeTimeoutInNs;
     }
 
     public String getUuid() {
@@ -79,13 +81,12 @@ public class MenkinsComputerLauncher extends JNLPLauncher {
                 }
             }
 
-            int iter = 1000;
-            while (iter > 0 && computer.isOffline() && computer.isConnecting()) {
+            long start = System.nanoTime();
+            while ((System.nanoTime() - start) < nodeTimeoutInNs && computer.isOffline() && computer.isConnecting()) {
                 try {
                     LOGGER.info("Waiting for slave computer connection " + name);
                     Thread.sleep(5000);
                 } catch (InterruptedException ignored) { return; }
-                iter--;
             }
             if (computer.isOnline()) {
                 LOGGER.info("menkins node connected " + name);

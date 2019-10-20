@@ -17,13 +17,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class MenkinsCloud extends Cloud {
 
     private static final Logger LOGGER = Logger.getLogger(MenkinsCloud.class.getName());
-    private static final int MAX_HOSTNAME_LENGTH = 63; // Guard against LONG hostnames - RFC-1034
+    private static final int MAX_HOSTNAME_LENGTH = 63;
+
+    private static final long NODE_TIMEOUT_NS = TimeUnit.MINUTES.toNanos(10);
 
     @DataBoundConstructor
     public MenkinsCloud() {
@@ -47,7 +50,7 @@ public class MenkinsCloud extends Cloud {
                 excessWorkload--;
                 String labels = label.getExpression().replaceAll("&", "");
                 String nodeName = buildNodeName(labels);
-                MenkinsSlave slave = new MenkinsSlave(nodeName, labels);
+                MenkinsSlave slave = new MenkinsSlave(nodeName, labels, NODE_TIMEOUT_NS);
                 nodes.add(new PlannedNode(this.getDisplayName(), Computer.threadPoolForRemoting
                         .submit(() -> {
                             // We do not need to explicitly add the Node here because that is handled by
