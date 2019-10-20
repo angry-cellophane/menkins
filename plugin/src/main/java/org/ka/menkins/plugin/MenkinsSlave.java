@@ -20,18 +20,20 @@ public class MenkinsSlave extends Slave  {
     private static final Logger LOGGER = Logger.getLogger(MenkinsSlave.class.getName());
 
     private final AtomicBoolean pendingDelete;
+    private final String menkinsUrl;
 
-    public MenkinsSlave(String name, String labels, long nodeTimeoutInNs) throws Descriptor.FormException, IOException {
+    public MenkinsSlave(String name, String labels, String menkinsUrl, long nodeTimeoutInNs) throws Descriptor.FormException, IOException {
         super(name,
                 labels,  // node description
                 "jenkins",
                 "1", // number of executors
                 Mode.EXCLUSIVE,
                 labels,
-                new MenkinsComputerLauncher(name, labels, nodeTimeoutInNs),
+                new MenkinsComputerLauncher(name, labels, menkinsUrl, nodeTimeoutInNs),
                 new MenkinsRetentionStrategy(3),
                 Collections.emptyList());
 
+        this.menkinsUrl = menkinsUrl;
         this.pendingDelete = new AtomicBoolean();
     }
 

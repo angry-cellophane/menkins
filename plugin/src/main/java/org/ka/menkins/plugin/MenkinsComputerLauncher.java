@@ -30,12 +30,14 @@ public class MenkinsComputerLauncher extends JNLPLauncher {
     private final String uuid;
     private final String name;
     private final String labels;
+    private final String menkinsUrl;
     private final long nodeTimeoutInNs;
 
-    public MenkinsComputerLauncher(String name, String labels, long nodeTimeoutInNs) {
+    public MenkinsComputerLauncher(String name, String labels, String menkinsUrl, long nodeTimeoutInNs) {
         this.uuid = UUID.randomUUID().toString();
         this.name = name;
         this.labels = labels;
+        this.menkinsUrl = menkinsUrl;
         this.nodeTimeoutInNs = nodeTimeoutInNs;
     }
 
@@ -67,7 +69,7 @@ public class MenkinsComputerLauncher extends JNLPLauncher {
         try {
             byte[] data = MAPPER.writeValueAsBytes(request);
 
-            HttpPost post = new HttpPost(URL);
+            HttpPost post = new HttpPost(createNodeUrl());
             post.addHeader("Content-Type", "application/json");
             post.setEntity(new ByteArrayEntity(data));
 
@@ -102,7 +104,7 @@ public class MenkinsComputerLauncher extends JNLPLauncher {
     public void terminate() {
         LOGGER.info("Sending request to terminate task " + this.uuid + ", node " + this.name);
 
-        HttpDelete request = new HttpDelete(URL + "/" + this.uuid);
+        HttpDelete request = new HttpDelete(terminateNodeUrl());
         try {
             try (CloseableHttpResponse response = HTTP.execute(request)) {
                 if (response.getStatusLine().getStatusCode() != 200) {
@@ -114,5 +116,13 @@ public class MenkinsComputerLauncher extends JNLPLauncher {
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error while trying to delete task " + this.uuid + ", node " + this.name, e);
         }
+    }
+
+    private String createNodeUrl() {
+        return this.menkinsUrl;
+    }
+
+    private String terminateNodeUrl() {
+        return this.menkinsUrl + "/" + this.uuid;
     }
 }

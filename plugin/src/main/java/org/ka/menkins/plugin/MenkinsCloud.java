@@ -28,6 +28,9 @@ public class MenkinsCloud extends Cloud {
 
     private static final long NODE_TIMEOUT_NS = TimeUnit.MINUTES.toNanos(10);
 
+    private String menkinsUrl;
+    private long nodeTimeoutSec;
+
     @DataBoundConstructor
     public MenkinsCloud() {
         super("MenkinsCloud");
@@ -50,7 +53,7 @@ public class MenkinsCloud extends Cloud {
                 excessWorkload--;
                 String labels = label.getExpression().replaceAll("&", "");
                 String nodeName = buildNodeName(labels);
-                MenkinsSlave slave = new MenkinsSlave(nodeName, labels, NODE_TIMEOUT_NS);
+                MenkinsSlave slave = new MenkinsSlave(nodeName, labels, this.menkinsUrl, TimeUnit.SECONDS.toNanos(this.nodeTimeoutSec));
                 nodes.add(new PlannedNode(this.getDisplayName(), Computer.threadPoolForRemoting
                         .submit(() -> {
                             // We do not need to explicitly add the Node here because that is handled by
@@ -83,6 +86,21 @@ public class MenkinsCloud extends Cloud {
         return StringUtils.left("menkins-jenkins-" + StringUtils.remove(UUID.randomUUID().toString(), '-') + suffix, MAX_HOSTNAME_LENGTH);
     }
 
+    public void setMenkinsUrl(String menkinsUrl) {
+        this.menkinsUrl = menkinsUrl;
+    }
+
+    public void setNodeTimeoutSec(long nodeTimeoutSec) {
+        this.nodeTimeoutSec = nodeTimeoutSec;
+    }
+
+    public String getMenkinsUrl() {
+        return menkinsUrl;
+    }
+
+    public long getNodeTimeoutSec() {
+        return nodeTimeoutSec;
+    }
 
     @Extension
     public static class DescriptorImpl extends Descriptor<Cloud> {

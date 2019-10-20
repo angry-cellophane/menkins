@@ -1,7 +1,5 @@
 <?jelly escape-by-default='true'?>
-<!--
-  This view is used to render the installed plugins page.
--->
 <div>
-  This plugin can be used to connect Jenkins to /dev/null
+  This plugin can be used to connect Jenkins to a builder node broker,
+  which uses Mesos to spin up builder nodes (K8s in future).
 </div>
