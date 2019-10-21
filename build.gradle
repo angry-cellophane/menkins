@@ -16,6 +16,7 @@ ext.libraries = [
         'mesos'             : 'org.apache.mesos:mesos:1.8.0',
         'groovy'            : "org.codehaus.groovy:groovy-all:2.5.7",
         'spock'             : "org.spockframework:spock-core:1.3-groovy-2.5",
+        'yaml'               : "org.yaml:snakeyaml:1.25"
 ]
 
 subprojects {

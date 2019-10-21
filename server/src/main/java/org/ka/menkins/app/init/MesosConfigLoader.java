@@ -8,6 +8,7 @@ import java.util.function.Function;
 final class MesosConfigLoader {
 
     static final PropertyNames LIB_PATH = PropertiesHolder.name("MESOS_LIBRARY", "mesos.lib.path");
+    static final PropertyNames NODES_CONFIG_PATH = PropertiesHolder.name("MESOS_NODES_CONFIG_FILE", "mesos.nodes.config.file");
     static final PropertyNames ROLE = PropertiesHolder.name("MESOS_ROLE", "mesos.role");
     static final PropertyNames SLAVE_USER = PropertiesHolder.name("MESOS_SLAVE_USER", "mesos.slave.user");
     static final PropertyNames FRAMEWORK_ID = PropertiesHolder.name("MESOS_FRAMEWORK_ID", "mesos.framework.id");
@@ -23,6 +24,7 @@ final class MesosConfigLoader {
             var mesos = AppConfig.Mesos.builder();
 
             var path = properties.getValue(LIB_PATH);
+            var nodeConfigFilePath = properties.getValue(NODES_CONFIG_PATH, () -> "mesos_nodes.yaml");
             var role = properties.getValue(ROLE);
             var id = properties.getValue(FRAMEWORK_ID, () -> UUID.randomUUID().toString());
             var slaveUser = properties.getValue(SLAVE_USER);
@@ -42,6 +44,7 @@ final class MesosConfigLoader {
                     .webUiUrl(webui)
                     .principal(principle)
                     .secret(secret)
+                    .nodeConfigPath(nodeConfigFilePath)
                     .build());
         };
     }

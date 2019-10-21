@@ -9,16 +9,17 @@ targetCompatibility = 11
 dependencies {
     compile project(':menkins-client')
 
+    compile libraries.mesos
+
     compile libraries.spark
     compile libraries.jackson
+    compile libraries.yaml
     compile libraries.hzClient
     compile libraries.prometheus_servlet
     compileOnly libraries.lombok
     annotationProcessor libraries.lombok
 
     compile libraries.log4j2
-
-    compile libraries.mesos
 
     testCompile libraries.groovy
     testCompile libraries.spock

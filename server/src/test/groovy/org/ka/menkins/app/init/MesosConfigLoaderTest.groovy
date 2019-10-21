@@ -8,15 +8,16 @@ class MesosConfigLoaderTest extends Specification {
         given:
         def props = new Properties()
         def env = [
-                (MesosConfigLoader.LIB_PATH.envName)     : '/var/path',
-                (MesosConfigLoader.MASTER_URL.envName)   : 'master:5050',
-                (MesosConfigLoader.ROLE.envName)         : '*',
-                (MesosConfigLoader.SLAVE_USER.envName)   : 'jenkins',
-                (MesosConfigLoader.FRAMEWORK_ID.envName) : '1234',
-                (MesosConfigLoader.CHECKPOINT_ON.envName): 'false',
-                (MesosConfigLoader.WEBUI_URL.envName)    : 'http://webui',
-                (MesosConfigLoader.PRINCIPLE.envName)    : 'principle',
-                (MesosConfigLoader.SECRET.envName)       : 'secret',
+                (MesosConfigLoader.LIB_PATH.envName)         : '/var/path',
+                (MesosConfigLoader.MASTER_URL.envName)       : 'master:5050',
+                (MesosConfigLoader.ROLE.envName)             : '*',
+                (MesosConfigLoader.SLAVE_USER.envName)       : 'jenkins',
+                (MesosConfigLoader.FRAMEWORK_ID.envName)     : '1234',
+                (MesosConfigLoader.CHECKPOINT_ON.envName)    : 'false',
+                (MesosConfigLoader.WEBUI_URL.envName)        : 'http://webui',
+                (MesosConfigLoader.PRINCIPLE.envName)        : 'principle',
+                (MesosConfigLoader.SECRET.envName)           : 'secret',
+                (MesosConfigLoader.NODES_CONFIG_PATH.envName): '/config/mesos.yaml',
         ]
         def holder = new PropertiesHolder(env, props)
 
@@ -35,6 +36,7 @@ class MesosConfigLoaderTest extends Specification {
             webUiUrl == 'http://webui'
             principal == 'principle'
             secret == 'secret'
+            nodeConfigPath == '/var/mesos.yaml'
         }
     }
 
@@ -50,6 +52,7 @@ class MesosConfigLoaderTest extends Specification {
         props.put(MesosConfigLoader.WEBUI_URL.propertyName, 'http://webui')
         props.put(MesosConfigLoader.PRINCIPLE.propertyName, 'principle')
         props.put(MesosConfigLoader.SECRET.propertyName, 'secret')
+        props.put(MesosConfigLoader.NODES_CONFIG_PATH.propertyName, '/var/mesos.yaml')
         def env = [:]
 
         def holder = new PropertiesHolder(env, props)
@@ -69,6 +72,7 @@ class MesosConfigLoaderTest extends Specification {
             webUiUrl == 'http://webui'
             principal == 'principle'
             secret == 'secret'
+            nodeConfigPath == '/var/mesos.yaml'
         }
     }
 
@@ -94,6 +98,7 @@ class MesosConfigLoaderTest extends Specification {
             checkpoint == true
             principal == 'jenkins'
             secret == ''
+            nodeConfigPath == 'mesos_nodes.yaml'
         }
     }
 

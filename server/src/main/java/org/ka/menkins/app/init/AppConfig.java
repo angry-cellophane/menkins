@@ -30,6 +30,7 @@ public class AppConfig {
         @NonNull String webUiUrl;
         @NonNull String principal;
         @NonNull String secret;
+        @NonNull String nodeConfigPath;
         double refuseInSeconds;
         boolean checkpoint;
     }
