@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hudson.model.TaskListener;
 import hudson.slaves.JNLPLauncher;
 import hudson.slaves.SlaveComputer;
+import jenkins.model.Jenkins;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
@@ -18,13 +19,15 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static jenkins.slaves.JnlpSlaveAgentProtocol.*;
+
 public class MenkinsComputerLauncher extends JNLPLauncher {
 
     private static final Logger LOGGER = Logger.getLogger(MenkinsComputerLauncher.class.getName());
-
     private static final ObjectMapper MAPPER = new ObjectMapper();
-
     private static final CloseableHttpClient HTTP = HttpClientBuilder.create().build();
+
+    private static final String JNLP_SECRET_FORMAT = "-secret %s";
 
     private final String uuid;
     private final String name;
@@ -59,7 +62,7 @@ public class MenkinsComputerLauncher extends JNLPLauncher {
                 .labels(this.labels)
                 .nodeName(this.name)
                 .jnlpArgs("-noReconnect")
-                .jnlpSecret("")
+                .jnlpSecret(getJnlpSecret(this.name))
                 .jnlpUrl(jenkinsUrl + "/computer/" + this.name + "/slave-agent.jnlp")
                 .slaveJarUrl(jenkinsUrl + "/jnlpJars/slave.jar")
                 .properties(Collections.emptyMap())
@@ -100,6 +103,14 @@ public class MenkinsComputerLauncher extends JNLPLauncher {
         } catch (Exception e) {
             LOGGER.warning("error when trying to launch " + name);
         }
+    }
+
+    private String getJnlpSecret(String slaveName) {
+        String jnlpSecret = "";
+        if(Jenkins.getInstance().isUseSecurity()) {
+            jnlpSecret = String.format(JNLP_SECRET_FORMAT, SLAVE_SECRET.mac(slaveName));
+        }
+        return jnlpSecret;
     }
 
     public void terminate() {

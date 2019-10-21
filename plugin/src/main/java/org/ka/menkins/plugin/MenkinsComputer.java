@@ -4,8 +4,14 @@ import hudson.model.Slave;
 import hudson.remoting.VirtualChannel;
 import hudson.slaves.SlaveComputer;
 import jenkins.model.Jenkins;
+import jenkins.slaves.EncryptedSlaveAgentJnlpFile;
+import org.kohsuke.stapler.HttpResponse;
+import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerResponse;
+import org.kohsuke.stapler.WebMethod;
 
 import javax.annotation.CheckForNull;
+import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.logging.Logger;
 
@@ -40,5 +46,11 @@ public class MenkinsComputer extends SlaveComputer {
             throw new IllegalStateException("jenkins.instance == null. Cannot remove slave " + this.getName());
         }
         jenkins.removeNode(this.getNode());
+    }
+
+    @Override
+    @WebMethod(name="slave-agent.jnlp")
+    public HttpResponse doSlaveAgentJnlp(StaplerRequest req, StaplerResponse res) throws IOException, ServletException {
+        return new EncryptedSlaveAgentJnlpFile(this, "menkins-slave-agent.jnlp.jelly", getName(), CONNECT);
     }
 }
