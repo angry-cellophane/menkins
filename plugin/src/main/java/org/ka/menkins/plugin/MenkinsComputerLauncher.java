@@ -19,7 +19,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static jenkins.slaves.JnlpSlaveAgentProtocol.*;
+import static jenkins.slaves.JnlpSlaveAgentProtocol.SLAVE_SECRET;
 
 public class MenkinsComputerLauncher extends JNLPLauncher {
 
