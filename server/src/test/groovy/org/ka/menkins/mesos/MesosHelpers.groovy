@@ -21,6 +21,7 @@ trait MesosHelpers {
             'http://webui',
             'principle',
             'secret',
+            '/var/path',
             600,
             true
     )
